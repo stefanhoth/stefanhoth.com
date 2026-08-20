@@ -70,8 +70,9 @@ Every monogram maker I found online was either a paid template shop or a form th
 - A written domain glossary keeps a solo project's naming consistent across code, UI copy, and docs. "Shape," "Frame," and "Arrangement" stopped being interchangeable in my own head too.
 - A small council of specialist review agents covering persistence, accessibility, product fit, and evidence catches state-corruption bugs a single review pass misses.
 
+
 - [GitHub](https://github.com/stefanhoth/monomix)
-- [Website](https://monomix.stefanhoth.com/)
+- [Live Web App](https://monomix.stefanhoth.com/)
 
 ## [📥 paperless-ngx-cli](https://github.com/stefanhoth/paperless-ngx-cli)
 
