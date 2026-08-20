@@ -1,6 +1,6 @@
 ---
 title: Projects
-description: A few things I've built on the side.
+description: A few things I've built on the side. Learning by doing.
 publish: true
 permalink: projects.md
 template: projects
@@ -10,7 +10,7 @@ template: projects
 
 A few things I've built on the side - mostly scratching my own itches around AI agents, job hunting, and home automation.
 
-## [🔦 STARlog](https://github.com/stefanhoth/starlog)
+## [🌟 STARlog](https://github.com/stefanhoth/starlog)
 
 *TypeScript · Gemini · Gemma4· runs entirely in the browser*
 
@@ -35,7 +35,7 @@ While this project started as a conversion of a basic skill in my job applicatio
 I came out with a lot of practical puzzle pieces I will be using in the future.
 
 - [GitHub](https://github.com/stefanhoth/starlog)
-- [Website](https://stefanhoth.github.io/starlog)
+- [Live Web App](https://starlog.stefanhoth.com/)
 
 ## [🦀 crusty-proxy](https://github.com/stefanhoth/crusty-proxy)
 
@@ -51,7 +51,29 @@ Self-hosting an agent means handing it credentials for every API it may ever cal
 
 - [GitHub](https://github.com/stefanhoth/crusty-proxy)
 
-## [paperless-ngx-cli](https://github.com/stefanhoth/paperless-ngx-cli)
+## [🔤 MonoMix](https://github.com/stefanhoth/monomix)
+
+*Svelte · TypeScript · Cloudflare Workers · runs entirely in the browser*
+
+**Type your initials, pick a look, and get a monogram you'd actually put on something.**
+
+MonoMix is a browser-local, installable PWA that turns one to three letters into a monogram. Pick a Design, add a Frame, tune the colors, and export as SVG, PNG, JPG, or PDF. Everything happens client-side, including autosave. Nothing you type ever leaves your machine.
+
+### Motivation
+
+Every monogram maker I found online was either a paid template shop or a form that uploads your initials to someone's server. I wanted the fast, local version instead: initials in, a good result out in seconds, nothing saved anywhere but my own browser.
+
+### What I learned
+
+- No compatible-license monogram font exists. Every Design is algorithmic composition, my own layout and clipping logic applied to ordinary OFL display fonts, not a font swap.
+- The rendering engine is a pure function: letters and config in, an SVG string out, no DOM. That let me snapshot-test dozens of Designs without a browser.
+- A written domain glossary keeps a solo project's naming consistent across code, UI copy, and docs. "Shape," "Frame," and "Arrangement" stopped being interchangeable in my own head too.
+- A small council of specialist review agents covering persistence, accessibility, product fit, and evidence catches state-corruption bugs a single review pass misses.
+
+- [GitHub](https://github.com/stefanhoth/monomix)
+- [Website](https://monomix.stefanhoth.com/)
+
+## [📥 paperless-ngx-cli](https://github.com/stefanhoth/paperless-ngx-cli)
 
 *Go · CLI · self-hosted*
 
