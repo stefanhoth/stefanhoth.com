@@ -1,8 +1,7 @@
 ---
 title: Stefan Hoth | Engineering Leader
-description: Engineering Leader building high-trust engineering organizations. Currently open to Director or Head of Engineering roles, remote-first.
+description: Engineering Leader building high-trust engineering organizations.
 tagline: Engineering Leader · Building high-trust engineering organizations
-jobhunt: "**Open to new roles:** Director or Head of Engineering, remote-first. Ideally with a founder or CTO building out their first engineering leadership layer, or a scale-up that needs structure brought into an established team."
 ---
 I build engineering organizations where happy teams ship sustainably and stakeholders trust the process.
 
