@@ -65,11 +65,13 @@ Every monogram maker I found online was either a paid template shop or a form th
 
 ### What I learned
 
-- No compatible-license monogram font exists. Every Design is algorithmic composition, my own layout and clipping logic applied to ordinary OFL display fonts, not a font swap.
-- The rendering engine is a pure function: letters and config in, an SVG string out, no DOM. That let me snapshot-test dozens of Designs without a browser.
-- A written domain glossary keeps a solo project's naming consistent across code, UI copy, and docs. "Shape," "Frame," and "Arrangement" stopped being interchangeable in my own head too.
-- A small council of specialist review agents covering persistence, accessibility, product fit, and evidence catches state-corruption bugs a single review pass misses.
+No compatible-license monogram font exists. Every Design is algorithmic composition, my own layout and clipping logic applied to ordinary OFL display fonts, not a font swap.
 
+The rendering engine is a pure function: letters and config in, an SVG string out, no DOM. That let me snapshot-test dozens of Designs without a browser.
+
+A written domain glossary keeps a solo project's naming consistent across code, UI copy, and docs. "Shape," "Frame," and "Arrangement" stopped being interchangeable in my own head too.
+
+A small council of specialist review agents covering persistence, accessibility, product fit, and evidence catches state-corruption bugs a single review pass misses.
 
 - [GitHub](https://github.com/stefanhoth/monomix)
 - [Live Web App](https://monomix.stefanhoth.com/)
