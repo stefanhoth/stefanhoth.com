@@ -108,7 +108,7 @@ jobs:
       E2E_BASE_URL: ${{ needs.preview.outputs.preview-url }}
     # Image tag must match @playwright/test's version in package.json.
     container:
-      image: mcr.microsoft.com/playwright:v1.62.1-noble
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
       options: --ipc=host
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
