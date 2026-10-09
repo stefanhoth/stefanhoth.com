@@ -130,11 +130,16 @@ Frontmatter controls publishing:
 
 ### Public Assets (PDFs & images)
 
-Files in the vault folder `_public-assets/` (e.g. talk PDFs) are published as downloads; nothing else outside the vault root's `*.md` pages is. The sync workflow already mirrors and commits them (`git add vault/`), so no workflow change is needed. At build time `publicAssetsCopy` (`astro.config.mjs`, logic in `src/lib/publicAssets.js`) copies them to `dist/_public-assets/`, where the Worker's `ASSETS` binding serves them at `/_public-assets/<path>` — the same path they have in the vault.
+Files in the vault folder `_public-assets/` (talk PDFs, event photos, screenshots) are published as downloads/images; nothing else outside the vault root's `*.md` pages is. The sync workflow already mirrors and commits them (`git add vault/`), so no workflow change is needed. At build time `publicAssetsCopy` (`astro.config.mjs`, logic in `src/lib/publicAssets.js`) publishes them to `dist/_public-assets/`, where the Worker's `ASSETS` binding serves them at `/_public-assets/<path>` — the same path they have in the vault.
 
-- Only `pdf`, `png`, `jpg`/`jpeg` and `webp` are copied (allowlist — a stray note in the folder never goes public; SVG is excluded on purpose, it can carry script). Dot-files and dot-folders are skipped; sub-folders are fine.
-- Link from a vault page with a vault-relative markdown link — `[Slides](_public-assets/starlog-talk.pdf)`, which also opens the PDF in Obsidian — or a wikilink by file name: `[[starlog-talk.pdf|Slides]]`. Both become `/_public-assets/...` URLs (`rehypePublicAssetLinks` / the wikilink `hrefTemplate`). Wikilinks match on the file name only, so keep names unique across sub-folders. Don't embed (`![[x.pdf]]`): the CSP (`object-src 'none'`, `frame-ancestors 'none'`) blocks inline PDFs — plain links only.
-- Everything in the vault is committed to this repo by the sync, so only put PDFs in the vault that are fine to be public in git history.
+- Only `pdf`, `png`, `jpg`/`jpeg`, `webp`, `gif` and `avif` are published (allowlist — a stray note in the folder never goes public; SVG is excluded on purpose, it can carry script; HEIC can't be shown by browsers — export iPhone photos as JPG). Dot-files and dot-folders are skipped; sub-folders are fine.
+- Images are optimised on the way out, originals stay untouched in the vault: `png`/`jpg`/`webp` are scaled down to at most 1600px wide (never enlarged), auto-rotated per EXIF, re-encoded and stripped of all metadata — **including the GPS location phones embed**. `pdf`/`gif`/`avif` are copied as they are. A file sharp can't read fails the build, naming the file.
+- Link or embed from a vault page:
+  - `[Slides](_public-assets/talk.pdf)` / `![Alt](_public-assets/photo.jpg)` — vault-relative markdown (also works in Obsidian), made root-absolute by `rehypePublicAssetLinks`
+  - `[[talk.pdf|Slides]]` — wikilink by file name
+  - `![[photo.jpg]]`, `![[photo.jpg|Alt text|300]]` — Obsidian embed (`remarkObsidianEmbeds`): a number after `|` is the width in px (height follows the aspect ratio), anything else is the alt text (default: file name). `![[talk.pdf]]` becomes a plain link — the CSP (`object-src 'none'`, `frame-ancestors 'none'`) blocks inline PDFs. An embed without a matching file stays visible as text.
+  - Names are matched case- and space-insensitively, by file name only, so keep them unique across sub-folders. Published images load lazily and are capped to the column width (`article.prose img` in `src/pages/[slug].astro`).
+- Everything in the vault is committed to this repo by the sync, so only put files in the vault that are fine to be public in git history (the originals — before optimisation — and their EXIF data are in there too).
 - `astro dev` doesn't serve the assets (the copy runs at build end); use `npm run build && npm run preview` or `npm run worker:dev`.
 
 ### Site Navigation

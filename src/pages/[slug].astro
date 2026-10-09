@@ -113,6 +113,15 @@ const ogImage = existsSync(join(process.cwd(), `public/img/og/${slug}.png`))
     }
   }
 
+  /* Images in page text (e.g. event photos from _public-assets/): never
+     wider than the column, height follows the aspect ratio whatever
+     width attribute an `![[photo.jpg|300]]` embed set. */
+  article.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
   /* Anchor jumps land below the sticky site header. */
   article.prose :is(h2, h3, h4) {
     scroll-margin-top: 5rem;

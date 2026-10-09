@@ -10,6 +10,7 @@ import {
   publicAssetHref,
   publicAssetsBySlug,
   rehypePublicAssetLinks,
+  remarkObsidianEmbeds,
 } from "./src/lib/publicAssets.js";
 import rehypeProjectCards from "./src/lib/rehypeProjectCards.js";
 
@@ -59,8 +60,8 @@ function publicAssetsCopy() {
   return {
     name: "public-assets-copy",
     hooks: {
-      "astro:build:done": ({ dir, logger }) => {
-        const copied = copyPublicAssets(vaultDir, fileURLToPath(dir));
+      "astro:build:done": async ({ dir, logger }) => {
+        const copied = await copyPublicAssets(vaultDir, fileURLToPath(dir));
         if (copied.length > 0) {
           logger.info(`Published ${copied.length} public asset(s)`);
         }
@@ -121,6 +122,7 @@ export default defineConfig({
             ],
           },
         ],
+        [remarkObsidianEmbeds, { assets: publicAssets }],
       ],
       rehypePlugins: [rehypeProjectCards, rehypePublicAssetLinks],
     }),
