@@ -28,7 +28,7 @@ While AI tools were writing code for the rest of us, my lead engineer was writin
 2. **Write down the agreed problems, including what you won't solve.** AI can list problems forever. It can't make people agree on which ones count.
 3. **Small makes trust possible.** Ship one tiny feature with a hard deadline to production. Risk doesn't disappear, it moves: code can be rolled back, trust can't.
 
-- [[migrations-and-AI.pdf]]
+- [[migrations-and-AI.pdf|Slides (PDF)]]
 - Recording: ⏳*waiting for it*
 - [Event](https://www.nextappcon.com/techlead-summit)
 
@@ -50,7 +50,7 @@ I wanted hands-on experience with agentic workflows on a real product, not a toy
 2. Specialist review agents (PM, Designer, Security, Senior Dev, Tester) keep a solo project disciplined.
 3. Cloud vs. local AI is a trade-off: Gemini adds a free tier and voice input, while local Gemma adds full privacy but only takes text.
 
-- [[STARlog.pdf]]
+- [[STARlog.pdf|Slides (PDF)]]
 - [Event](https://luma.com/qg7ni1r8)
 - [Try STARlog](https://starlog.stefanhoth.com) · [GitHub](https://github.com/stefanhoth/starlog)
 
