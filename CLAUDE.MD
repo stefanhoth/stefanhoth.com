@@ -137,6 +137,10 @@ Files in the vault folder `_public-assets/` (e.g. talk PDFs) are published as do
 - Everything in the vault is committed to this repo by the sync, so only put PDFs in the vault that are fine to be public in git history.
 - `astro dev` doesn't serve the assets (the copy runs at build end); use `npm run build && npm run preview` or `npm run worker:dev`.
 
+### Site Navigation
+
+`src/components/SiteHeader.astro` builds the header nav from the published vault pages. `NAV_GROUPS` (in that file) defines the dropdown groups — "About me" (How I show up, How I manage) and "About my work" (What I built, Talks I gave) — with their labels and page order; a group with a single published page collapses into a plain link, one with none disappears, and published pages no group lists follow as plain links. Dropdown behaviour lives in `src/lib/navMenu.js` (jsdom-tested in `tests/dom/navMenu.dom.test.js`): mouse hover opens (a click pins it), touch/keyboard toggle, Escape/outside press/focus-out close. The panel is `position: absolute` and solid (no `backdrop-filter`), so opening never shifts the page; on phones it becomes a full-width sheet with 44px tap targets. `tests/e2e/nav-menu.spec.ts` covers desktop and touch.
+
 ### Social Sharing Previews
 
 `Layout.astro` emits per-page Open Graph / Twitter Card meta tags plus a per-page canonical URL (the `.md` form for file-style vault pages). The 1200×630 preview images live in `public/img/og/` — one per published vault page plus `home.png` (front page) and `default.png` (fallback for pages without a generated card). They are rendered from vault frontmatter (`title`/`description`) by `scripts/generate-og-images.mjs` (sharp, palette-quantized to stay under WhatsApp's ~300 KB preview limit) and committed. The vault sync workflow regenerates them whenever it pulls content changes, so cards never go stale relative to frontmatter; generation is deterministic, so unchanged frontmatter causes no image churn. Run `npm run og:images` manually only after changing the card design or the profile photo.

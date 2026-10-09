@@ -6,40 +6,65 @@ import { getCollection } from "astro:content";
 // canonical URL (file-style `.md` permalinks included) to avoid the
 // Worker's 301 redirect hop.
 //
-// Nav labels are presentation, not content, so they live here rather than
-// in the vault (same trade-off as the Links list, see the CMS plan). The
-// map's insertion order is the nav order; pages not listed fall back to
-// their title and sort behind, alphabetically.
-const NAV_LABELS = new Map([
-  ["employee-readme", "How I show up"],
-  ["manager-readme", "How I manage"],
-  ["projects", "What I built"],
-]);
+// Nav structure and labels are presentation, not content, so they live here
+// rather than in the vault (same trade-off as the Links list, see the CMS
+// plan). Each group becomes a dropdown holding its published pages, in the
+// order listed; a group with a single published page collapses into a plain
+// link, one with none disappears. Published pages that no group lists follow
+// as plain links, alphabetically.
+const NAV_GROUPS = [
+  {
+    label: "About me",
+    pages: [
+      ["employee-readme", "How I show up"],
+      ["manager-readme", "How I manage"],
+    ],
+  },
+  {
+    label: "About my work",
+    pages: [
+      ["projects", "What I built"],
+      ["talks", "Talks I gave"],
+    ],
+  },
+];
 
 const pages = await getCollection("pages", ({ data }) => data.publish);
-const knownOrder = [...NAV_LABELS.keys()];
-
-const navItems = pages
-  .map((page) => {
+const publishedByKey = new Map(
+  pages.map((page) => {
     const slug = page.data.permalink ?? page.id;
-    const key = slug.replace(/\.md$/, "");
-    return {
-      href: `/${slug}`,
-      label: NAV_LABELS.get(key) ?? page.data.title,
-      key,
-    };
-  })
-  .sort((a, b) => {
-    const rankA = knownOrder.indexOf(a.key);
-    const rankB = knownOrder.indexOf(b.key);
-    if (rankA !== -1 || rankB !== -1) {
-      return (
-        (rankA === -1 ? knownOrder.length : rankA) -
-        (rankB === -1 ? knownOrder.length : rankB)
-      );
-    }
-    return a.label.localeCompare(b.label);
-  });
+    return [
+      slug.replace(/\.md$/, ""),
+      { href: `/${slug}`, title: page.data.title },
+    ];
+  }),
+);
+const grouped = new Set(
+  NAV_GROUPS.flatMap((group) => group.pages.map(([key]) => key)),
+);
+
+const navEntries = [
+  ...NAV_GROUPS.map((group) => ({
+    label: group.label,
+    items: group.pages
+      .filter(([key]) => publishedByKey.has(key))
+      .map(([key, label]) => ({
+        key,
+        label,
+        href: publishedByKey.get(key).href,
+      })),
+  }))
+    .filter((group) => group.items.length > 0)
+    .map((group, index) =>
+      group.items.length === 1
+        ? { ...group.items[0] }
+        : { ...group, id: `nav-panel-${index}` },
+    ),
+  ...[...publishedByKey]
+    .filter(([key]) => !grouped.has(key))
+    .map(([key, page]) => ({ key, label: page.title, href: page.href }))
+    .sort((a, b) => a.label.localeCompare(b.label)),
+];
 
 const currentKey = Astro.url.pathname
   .replace(/\.md$/, "")
@@ -55,18 +80,82 @@ const isHome = currentKey === "";
     {!isHome && <a class="wordmark" href="/">Stefan Hoth</a>}
     <nav aria-label="Site">
       {
-        navItems.map((item) => (
-          <a
-            href={item.href}
-            aria-current={item.key === currentKey ? "page" : undefined}
-          >
-            {item.label}
-          </a>
-        ))
+        navEntries.map((entry) =>
+          entry.items ? (
+            <div class="nav-group" data-nav-group>
+              <button
+                type="button"
+                class="nav-trigger"
+                data-nav-trigger
+                data-current={
+                  entry.items.some((item) => item.key === currentKey)
+                    ? ""
+                    : undefined
+                }
+                aria-expanded="false"
+                aria-controls={entry.id}
+              >
+                {entry.label}
+              </button>
+              <div class="nav-panel" id={entry.id}>
+                <ul>
+                  {entry.items.map((item) => (
+                    <li>
+                      <a
+                        href={item.href}
+                        aria-current={item.key === currentKey ? "page" : undefined}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <a
+              href={entry.href}
+              aria-current={entry.key === currentKey ? "page" : undefined}
+            >
+              {entry.label}
+            </a>
+          ),
+        )
       }
     </nav>
   </div>
 </header>
+
+<noscript>
+  <!-- Without JS the dropdowns can't open — list every group's links inline. -->
+  <style>
+    .nav-panel {
+      display: block !important;
+      position: static !important;
+    }
+    .nav-trigger {
+      display: none;
+    }
+    .nav-group {
+      display: flex;
+      gap: 0.25rem 1.5rem;
+    }
+    .nav-panel ul {
+      display: flex;
+      gap: 0.25rem 1.5rem;
+      border: 0 !important;
+      box-shadow: none !important;
+      background: none !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { initNavMenu } from "../lib/navMenu.js";
+
+  const nav = document.querySelector('nav[aria-label="Site"]');
+  if (nav) initNavMenu(nav);
+</script>
 
 <style>
   /* Sticky frosted-glass bar, edge-to-edge so it matches the ambient
@@ -132,5 +221,128 @@ const isHome = currentKey === "";
   nav a[aria-current="page"] {
     color: var(--text);
     font-weight: 600;
+  }
+
+  .site-header-inner {
+    position: relative;
+  }
+
+  /* Dropdown groups. The panel is absolutely positioned and hidden with
+     display: none, so opening it never reflows the header or the page. */
+  .nav-group {
+    position: relative;
+  }
+
+  .nav-trigger {
+    display: inline-flex;
+    align-items: baseline;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .nav-trigger:hover,
+  .nav-group[data-open] > .nav-trigger {
+    color: var(--accent);
+  }
+
+  .nav-trigger[data-current] {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .nav-trigger:focus-visible,
+  .nav-panel a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Chevron: transform on a pseudo-element doesn't affect layout. */
+  .nav-trigger::after {
+    content: "";
+    width: 0.38em;
+    height: 0.38em;
+    margin-left: 0.5em;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-0.2em) rotate(45deg);
+  }
+
+  .nav-group[data-open] > .nav-trigger::after {
+    transform: translateY(0.05em) rotate(-135deg);
+  }
+
+  /* The transparent padding-top bridges the gap between trigger and list,
+     so a hovering pointer never leaves the group on its way down. */
+  .nav-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1;
+    min-width: 12rem;
+    padding-top: 0.6rem;
+  }
+
+  .nav-group[data-open] > .nav-panel {
+    display: block;
+  }
+
+  /* Solid surface (no backdrop-filter): nothing shows through or
+     re-blurs while the page scrolls underneath. */
+  .nav-panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card-bg);
+    box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.25);
+  }
+
+  .nav-panel a {
+    display: block;
+    padding: 0.55rem 0.8rem;
+    border-radius: 6px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .nav-panel a:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+  }
+
+  .nav-panel a[aria-current="page"] {
+    font-weight: 600;
+  }
+
+  /* Phones: the panel becomes a full-width sheet hanging off the header's
+     bottom edge, with 44px+ tap targets. Still out of flow. */
+  @media (max-width: 700px) {
+    nav {
+      gap: 0.25rem 1.25rem;
+    }
+
+    .nav-group {
+      position: static;
+    }
+
+    .nav-panel {
+      left: 1rem;
+      right: 1rem;
+      min-width: 0;
+      padding-top: 0.25rem;
+    }
+
+    .nav-panel a {
+      padding: 0.8rem 0.9rem;
+    }
   }
 </style>
