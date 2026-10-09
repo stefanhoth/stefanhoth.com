@@ -210,6 +210,114 @@ describe("rehypeProjectCards", () => {
     expect(list.properties.className).toBeUndefined();
   });
 
+  describe("action row variants", () => {
+    // A card shaped like a talk entry: pitch, an h3 section with an ordered
+    // list, then the trailing list under test.
+    const cardWith = (list) => {
+      const tree = {
+        type: "root",
+        children: [
+          el("h2", text("Talk")),
+          el("p", text("Abstract")),
+          el("h3", text("Key takeaways")),
+          el("ol", el("li", text("One")), el("li", text("Two"))),
+          list,
+        ],
+      };
+      run(tree, "projects");
+      return tree.children[0];
+    };
+
+    const labels = (ul) =>
+      ul.children.map((li) =>
+        li.children
+          .map((child) => child.children?.[0]?.value ?? child.value)
+          .join(""),
+      );
+
+    it("splits an item holding several links into one button per link", () => {
+      const card = cardWith(
+        el(
+          "ul",
+          el("li", el("a", text("Event"))),
+          el(
+            "li",
+            el("a", text("Try it")),
+            text(" · "),
+            el("a", text("GitHub")),
+          ),
+        ),
+      );
+
+      const links = card.children.at(-1);
+      expect(links.properties.className).toEqual(["project-links"]);
+      expect(labels(links)).toEqual(["Event", "Try it", "GitHub"]);
+      expect(links.children.every((li) => li.children.length === 1)).toBe(true);
+    });
+
+    it("keeps a short 'Label: status' note in the row as a muted pill", () => {
+      const card = cardWith(
+        el(
+          "ul",
+          el("li", el("a", text("Slides"))),
+          el("li", text("Recording: ⏳"), el("em", text("waiting for it"))),
+          el("li", el("a", text("Event"))),
+        ),
+      );
+
+      const links = card.children.at(-1);
+      expect(links.properties.className).toEqual(["project-links"]);
+      expect(links.children.map((li) => li.properties.className)).toEqual([
+        undefined,
+        ["project-note"],
+        undefined,
+      ]);
+      // The talk's own details section no longer swallows the list.
+      const details = card.children.at(-2);
+      expect(details.tagName).toBe("details");
+      expect(details.children.map((c) => c.tagName)).toEqual(["summary", "ol"]);
+    });
+
+    it("needs at least one link: a list of notes alone stays in the section", () => {
+      const list = el(
+        "ul",
+        el("li", text("Recording: soon")),
+        el("li", text("Slides: soon")),
+      );
+
+      const card = cardWith(list);
+
+      expect(card.children.at(-1).tagName).toBe("details");
+      expect(list.properties.className).toBeUndefined();
+    });
+
+    it("keeps lists with prose bullets inside the section", () => {
+      for (const prose of [
+        // no "Label:" prefix
+        el("li", text("Ship small")),
+        // has a colon, but far too long for a status note
+        el(
+          "li",
+          text("Cloud vs. local AI is a trade-off: Gemini adds a free tier"),
+        ),
+        // text mixed with a link is neither links-only nor a note
+        el(
+          "li",
+          text("See the "),
+          el("a", text("write-up")),
+          text(" for details"),
+        ),
+      ]) {
+        const list = el("ul", prose, el("li", el("a", text("GitHub"))));
+
+        const card = cardWith(list);
+
+        expect(card.children.at(-1).tagName).toBe("details");
+        expect(list.properties.className).toBeUndefined();
+      }
+    });
+  });
+
   it("leaves pages with other templates untouched", () => {
     const children = [el("h2", text("Heading")), el("p", text("Body"))];
     const tree = { type: "root", children: [...children] };
