@@ -17,8 +17,10 @@
 // - every h3 opens a collapsible section (<details>): the h3 text is the
 //   summary, everything up to the next h3 is the collapsed body — meant
 //   for "The story" / "Lessons learned"
-// - a trailing bullet list whose items are only links becomes the card's
-//   action row (e.g. GitHub, write-up, slides)
+// - a trailing bullet list of links becomes the card's action row (e.g.
+//   GitHub, write-up, slides): an item may hold several links (each becomes
+//   its own button) or be a short "Label: status" note without a link, like
+//   "Recording: ⏳ waiting for it" (shown as a muted pill)
 
 const text = (value) => ({ type: "text", value });
 
@@ -91,21 +93,55 @@ const isMetaParagraph = (node) => isParagraphWrappingOnly(node, "em");
 // A paragraph holding nothing but a <strong> line is the pitch.
 const isPitchParagraph = (node) => isParagraphWrappingOnly(node, "strong");
 
-// A bullet list whose items each contain exactly one link and nothing
-// else is the card's action row.
-function isLinkList(node) {
-  if (node?.type !== "element" || node.tagName !== "ul") return false;
-  const items = node.children.filter((child) => child.type === "element");
-  return (
-    items.length > 0 &&
-    items.every((li) => {
-      if (li.tagName !== "li") return false;
-      const content = li.children.filter(
-        (child) => child.type !== "text" || child.value.trim() !== "",
-      );
-      return content.length === 1 && content[0].tagName === "a";
-    })
+// An item made of links and nothing but separators between them, e.g.
+// `[Try it](…) · [GitHub](…)`. Returns the links, or null for any other item.
+const SEPARATORS = /^[\s·|•,/–—-]*$/;
+
+function linksOnly(li) {
+  const content = li.children.filter(
+    (child) => child.type !== "text" || child.value.trim() !== "",
   );
+  const links = content.filter((child) => child.tagName === "a");
+  const rest = li.children.filter((child) => child.tagName !== "a");
+  const onlySeparators = rest.every(
+    (child) => child.type === "text" && SEPARATORS.test(child.value),
+  );
+  return links.length > 0 && onlySeparators ? links : null;
+}
+
+// A link-free "Label: status" note — short, with a short label before the
+// colon — so a placeholder like "Recording: ⏳ waiting for it" can sit in the
+// action row. Plain prose bullets don't match (no label, or too long).
+function isStatusNote(li) {
+  const value = textContent(li).trim();
+  const hasLink = (node) =>
+    node.tagName === "a" || (node.children ?? []).some(hasLink);
+  return !hasLink(li) && value.length <= 48 && /^[^:]{1,24}:\s*\S/.test(value);
+}
+
+// A bullet list is the card's action row when every item is links-only or a
+// status note, and at least one item holds a link. Returns the normalised
+// items (one <li> per link, notes marked `project-note`), or null.
+function toActionItems(node) {
+  if (node?.type !== "element" || node.tagName !== "ul") return null;
+  const items = node.children.filter((child) => child.type === "element");
+  if (items.length === 0) return null;
+
+  const actions = [];
+  let hasLink = false;
+  for (const li of items) {
+    if (li.tagName !== "li") return null;
+    const links = linksOnly(li);
+    if (links) {
+      hasLink = true;
+      actions.push(...links.map((link) => el("li", {}, [link])));
+    } else if (isStatusNote(li)) {
+      actions.push(el("li", { className: ["project-note"] }, li.children));
+    } else {
+      return null;
+    }
+  }
+  return hasLink ? actions : null;
 }
 
 function toChips(paragraph) {
@@ -134,10 +170,12 @@ function buildCard(h2) {
 // <details>, and appends a trailing link list as the action row.
 function fillCard(card, nodes) {
   let linkList = null;
+  let actions = null;
   for (let i = nodes.length - 1; i >= 0; i--) {
     const node = nodes[i];
     if (node.type === "text" && node.value.trim() === "") continue;
-    if (isLinkList(node)) {
+    actions = toActionItems(node);
+    if (actions) {
       linkList = node;
       nodes.splice(i, 1);
     }
@@ -168,6 +206,7 @@ function fillCard(card, nodes) {
 
   if (linkList) {
     linkList.properties.className = ["project-links"];
+    linkList.children = actions;
     card.children.push(linkList);
   }
 }

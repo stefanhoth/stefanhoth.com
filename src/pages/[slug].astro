@@ -343,6 +343,17 @@ const ogImage = existsSync(join(process.cwd(), `public/img/og/${slug}.png`))
     color: var(--text);
   }
 
+  /* "Label: status" notes without a link (e.g. "Recording: ⏳ waiting for
+     it"): same pill shape as the buttons, but dashed and muted. */
+  body.projects-page .project-links .project-note {
+    display: inline-block;
+    padding: 0.35rem 0.85rem;
+    border: 1px dashed var(--border);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: var(--text-muted, #666);
+  }
+
   body.projects-page .project-links a::after {
     content: " ↗";
     font-size: 0.8em;
