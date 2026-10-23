@@ -179,7 +179,11 @@ describe("rehypeProjectCards", () => {
         el("p", text("Description")),
         el("h3", text("Lessons learned")),
         el("p", text("Lesson body")),
-        el("ul", el("li", el("a", text("GitHub"))), el("li", el("a", text("Slides")))),
+        el(
+          "ul",
+          el("li", el("a", text("GitHub"))),
+          el("li", el("a", text("Slides"))),
+        ),
       ],
     };
 
@@ -200,7 +204,11 @@ describe("rehypeProjectCards", () => {
       type: "root",
       children: [
         el("h2", text("Project")),
-        el("ul", el("li", text("plain bullet")), el("li", el("a", text("GitHub")))),
+        el(
+          "ul",
+          el("li", text("plain bullet")),
+          el("li", el("a", text("GitHub"))),
+        ),
       ],
     };
 

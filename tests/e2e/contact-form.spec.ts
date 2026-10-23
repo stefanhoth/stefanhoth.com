@@ -22,8 +22,13 @@ test("renders the form with a working Turnstile widget and enabled submit button
   await expect(page.locator("#contact-status")).toBeHidden();
 });
 
-test("renders the form and the real Turnstile widget loads without errors", async ({ page }) => {
-  test.skip(!REMOTE, "Remote-only variant: needs a deployed Worker with the real sitekey");
+test("renders the form and the real Turnstile widget loads without errors", async ({
+  page,
+}) => {
+  test.skip(
+    !REMOTE,
+    "Remote-only variant: needs a deployed Worker with the real sitekey",
+  );
 
   await page.goto("/");
 
@@ -36,7 +41,9 @@ test("renders the form and the real Turnstile widget loads without errors", asyn
   await expect(page.locator("#contact-status")).toBeHidden();
 });
 
-test("shows a success banner and cleans the URL for ?sent=true", async ({ page }) => {
+test("shows a success banner and cleans the URL for ?sent=true", async ({
+  page,
+}) => {
   await page.goto("/?sent=true");
 
   const status = page.locator("#contact-status");
@@ -45,7 +52,9 @@ test("shows a success banner and cleans the URL for ?sent=true", async ({ page }
   await expect(page).toHaveURL(/\/$/);
 });
 
-test("shows an error banner and cleans the URL for ?error=true", async ({ page }) => {
+test("shows an error banner and cleans the URL for ?error=true", async ({
+  page,
+}) => {
   await page.goto("/?error=true");
 
   const status = page.locator("#contact-status");
@@ -54,8 +63,13 @@ test("shows an error banner and cleans the URL for ?error=true", async ({ page }
   await expect(page).toHaveURL(/\/$/);
 });
 
-test("disables submit and warns when the Turnstile script fails to load", async ({ page }) => {
-  await page.route("**/challenges.cloudflare.com/turnstile/v0/api.js", (route) => route.abort());
+test("disables submit and warns when the Turnstile script fails to load", async ({
+  page,
+}) => {
+  await page.route(
+    "**/challenges.cloudflare.com/turnstile/v0/api.js",
+    (route) => route.abort(),
+  );
 
   await page.goto("/");
 

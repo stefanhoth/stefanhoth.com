@@ -162,18 +162,20 @@ async function renderCard(page) {
     .resize(photoSize, photoSize)
     .png()
     .toBuffer();
-  return sharp(Buffer.from(svgCard(page)))
-    .composite([
-      {
-        input: photo,
-        left: WIDTH - photoSize - 70,
-        top: Math.round((HEIGHT - photoSize) / 2),
-      },
-    ])
-    // Palette quantization keeps each card well under 300 KB — WhatsApp
-    // (and some other messengers) won't show a preview image above that.
-    .png({ palette: true, quality: 90, compressionLevel: 9 })
-    .toBuffer();
+  return (
+    sharp(Buffer.from(svgCard(page)))
+      .composite([
+        {
+          input: photo,
+          left: WIDTH - photoSize - 70,
+          top: Math.round((HEIGHT - photoSize) / 2),
+        },
+      ])
+      // Palette quantization keeps each card well under 300 KB — WhatsApp
+      // (and some other messengers) won't show a preview image above that.
+      .png({ palette: true, quality: 90, compressionLevel: 9 })
+      .toBuffer()
+  );
 }
 
 mkdirSync(OUT_DIR, { recursive: true });

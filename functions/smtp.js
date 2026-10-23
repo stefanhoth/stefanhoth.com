@@ -27,7 +27,9 @@ async function sendCommand(writer, reader, command) {
 
 function assertCode(response, expectedCodes, step) {
   if (!expectedCodes.includes(response.code)) {
-    throw new Error(`SMTP ${step} failed (${response.code}): ${response.text.trim()}`);
+    throw new Error(
+      `SMTP ${step} failed (${response.code}): ${response.text.trim()}`,
+    );
   }
 }
 
@@ -60,25 +62,54 @@ function dotStuff(message) {
   return message.replace(/\r\n\./g, "\r\n..");
 }
 
-export async function sendMailViaSmtp({ host, port, username, password, from, to, replyTo, subject, text, html }) {
+export async function sendMailViaSmtp({
+  host,
+  port,
+  username,
+  password,
+  from,
+  to,
+  replyTo,
+  subject,
+  text,
+  html,
+}) {
   const socket = connect({ hostname: host, port }, { secureTransport: "on" });
   const writer = socket.writable.getWriter();
   const reader = socket.readable.getReader();
 
   try {
     assertCode(await readResponse(reader), [220], "greeting");
-    assertCode(await sendCommand(writer, reader, `EHLO ${EHLO_DOMAIN}`), [250], "EHLO");
+    assertCode(
+      await sendCommand(writer, reader, `EHLO ${EHLO_DOMAIN}`),
+      [250],
+      "EHLO",
+    );
 
     const authToken = btoa(`\0${username}\0${password}`);
-    assertCode(await sendCommand(writer, reader, `AUTH PLAIN ${authToken}`), [235], "AUTH");
+    assertCode(
+      await sendCommand(writer, reader, `AUTH PLAIN ${authToken}`),
+      [235],
+      "AUTH",
+    );
 
     // The envelope takes a bare address — `from` may be `"Display Name" <addr>`.
     const envelopeFrom = from.match(/<([^>]+)>/)?.[1] ?? from;
-    assertCode(await sendCommand(writer, reader, `MAIL FROM:<${envelopeFrom}>`), [250], "MAIL FROM");
-    assertCode(await sendCommand(writer, reader, `RCPT TO:<${to}>`), [250], "RCPT TO");
+    assertCode(
+      await sendCommand(writer, reader, `MAIL FROM:<${envelopeFrom}>`),
+      [250],
+      "MAIL FROM",
+    );
+    assertCode(
+      await sendCommand(writer, reader, `RCPT TO:<${to}>`),
+      [250],
+      "RCPT TO",
+    );
     assertCode(await sendCommand(writer, reader, "DATA"), [354], "DATA");
 
-    const message = dotStuff(buildMimeMessage({ from, to, replyTo, subject, text, html }));
+    const message = dotStuff(
+      buildMimeMessage({ from, to, replyTo, subject, text, html }),
+    );
     await writer.write(encode(`${message}\r\n.\r\n`));
     assertCode(await readResponse(reader), [250], "message body");
 
