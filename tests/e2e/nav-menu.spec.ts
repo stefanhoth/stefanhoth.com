@@ -26,7 +26,7 @@ test.describe("desktop (mouse)", () => {
   test("opens on hover, stays open while moving to the panel, closes on leave", async ({
     page,
   }) => {
-    await page.goto("/projects/");
+    await page.goto("/projects");
     await expect(panel(page)).toBeHidden();
 
     await trigger(page).hover();
@@ -43,7 +43,7 @@ test.describe("desktop (mouse)", () => {
   test("a click on the hover-opened trigger keeps the menu open, a second click closes it", async ({
     page,
   }) => {
-    await page.goto("/projects/");
+    await page.goto("/projects");
 
     await trigger(page).hover();
     await trigger(page).click();
@@ -57,7 +57,7 @@ test.describe("desktop (mouse)", () => {
   });
 
   test("Escape closes the menu and focuses the trigger", async ({ page }) => {
-    await page.goto("/projects/");
+    await page.goto("/projects");
     await trigger(page).focus();
     await page.keyboard.press("Enter");
     await expect(panel(page)).toBeVisible();
@@ -68,7 +68,7 @@ test.describe("desktop (mouse)", () => {
   });
 
   test("opening the menu doesn't move anything", async ({ page }) => {
-    await page.goto("/projects/");
+    await page.goto("/projects");
     const before = await layoutSnapshot(page);
 
     await trigger(page).click();
@@ -86,7 +86,7 @@ test.describe("phone (touch)", () => {
   });
 
   test("header stays on one row, also on the home page", async ({ page }) => {
-    for (const path of ["/", "/projects/"]) {
+    for (const path of ["/", "/projects"]) {
       await page.goto(path);
       const rows = await page
         .locator(".site-header nav > *")
@@ -137,7 +137,7 @@ test.describe("phone (touch)", () => {
 test("the header never causes horizontal scroll", async ({ page }) => {
   for (const width of [320, 360, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 700 });
-    await page.goto("/projects/");
+    await page.goto("/projects");
     await trigger(page).click();
     const { scrollWidth } = await layoutSnapshot(page);
     expect(scrollWidth, `${width}px`).toBeLessThanOrEqual(width);

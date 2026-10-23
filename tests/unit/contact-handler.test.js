@@ -28,7 +28,10 @@ function buildRequest(overrides = {}) {
   for (const [key, value] of Object.entries(fields)) {
     if (value !== undefined) formData.set(key, value);
   }
-  return new Request("https://example.com/contact", { method: "POST", body: formData });
+  return new Request("https://example.com/contact", {
+    method: "POST",
+    body: formData,
+  });
 }
 
 function mockTurnstileVerify(success) {
@@ -50,10 +53,15 @@ describe("onRequestPost", () => {
   it("redirects to /?error=true when Turnstile verification fails", async () => {
     mockTurnstileVerify(false);
 
-    const response = await onRequestPost({ request: buildRequest(), env: buildEnv() });
+    const response = await onRequestPost({
+      request: buildRequest(),
+      env: buildEnv(),
+    });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -66,7 +74,9 @@ describe("onRequestPost", () => {
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -74,10 +84,15 @@ describe("onRequestPost", () => {
     mockTurnstileVerify(true);
     sendMailViaSmtp.mockRejectedValue(new Error("SMTP down"));
 
-    const response = await onRequestPost({ request: buildRequest(), env: buildEnv() });
+    const response = await onRequestPost({
+      request: buildRequest(),
+      env: buildEnv(),
+    });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
   });
 
   it("redirects to /?error=true when name contains a CRLF (header injection attempt)", async () => {
@@ -89,7 +104,9 @@ describe("onRequestPost", () => {
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -97,12 +114,16 @@ describe("onRequestPost", () => {
     mockTurnstileVerify(true);
 
     const response = await onRequestPost({
-      request: buildRequest({ email: "jane@example.com\r\nBcc: attacker@example.com" }),
+      request: buildRequest({
+        email: "jane@example.com\r\nBcc: attacker@example.com",
+      }),
       env: buildEnv(),
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -115,7 +136,9 @@ describe("onRequestPost", () => {
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -128,7 +151,9 @@ describe("onRequestPost", () => {
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -143,17 +168,27 @@ describe("onRequestPost", () => {
     const response = await onRequestPost({ request, env: buildEnv() });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
   it("redirects to /?error=true when the Turnstile siteverify call throws (fails closed)", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("siteverify down")));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new Error("siteverify down")),
+    );
 
-    const response = await onRequestPost({ request: buildRequest(), env: buildEnv() });
+    const response = await onRequestPost({
+      request: buildRequest(),
+      env: buildEnv(),
+    });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?error=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?error=true",
+    );
     expect(sendMailViaSmtp).not.toHaveBeenCalled();
   });
 
@@ -167,7 +202,9 @@ describe("onRequestPost", () => {
     });
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe("https://example.com/?sent=true");
+    expect(response.headers.get("location")).toBe(
+      "https://example.com/?sent=true",
+    );
 
     expect(sendMailViaSmtp).toHaveBeenCalledTimes(1);
     const mailArgs = sendMailViaSmtp.mock.calls[0][0];

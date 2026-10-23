@@ -18,9 +18,9 @@ const pages = defineCollection({
       title: z.string().optional(),
       description: z.string().optional(),
       publish: z.boolean().default(false),
-      // Overrides the filename-derived slug. With a `.md` suffix the page
-      // is published as a file-style URL (/<slug>.md, served by the Worker);
-      // without it, as a regular folder-style URL (/<slug>/).
+      // Overrides the filename-derived slug. The page is served as HTML at
+      // /<slug>/ and as Markdown at /<slug>.md. A trailing `.md` is a
+      // legacy of the old file-style URLs and is ignored.
       permalink: z
         .string()
         .regex(

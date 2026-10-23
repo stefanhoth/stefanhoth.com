@@ -46,7 +46,14 @@ describe("initContactForm", () => {
     const { form, statusEl } = renderForm();
     const fakeWindow = {
       location: { pathname: "/", search: "?sent=true", hash: "" },
-      history: { replaceState: (_state, _title, url) => { fakeWindow.location.search = new URL(url, "https://example.com").search; } },
+      history: {
+        replaceState: (_state, _title, url) => {
+          fakeWindow.location.search = new URL(
+            url,
+            "https://example.com",
+          ).search;
+        },
+      },
       setTimeout: () => {},
       turnstile: {},
     };
@@ -111,7 +118,12 @@ describe("initContactForm", () => {
       turnstile: undefined,
     };
 
-    initContactForm({ form, statusEl, win: fakeWindow, turnstileLoadTimeoutMs: 8000 });
+    initContactForm({
+      form,
+      statusEl,
+      win: fakeWindow,
+      turnstileLoadTimeoutMs: 8000,
+    });
     expect(button.disabled).toBe(false);
 
     timeoutCallback();
