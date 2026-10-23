@@ -1,10 +1,10 @@
 ---
 import { getCollection } from "astro:content";
+import { htmlPath, pageSlug } from "../lib/pagePaths.js";
 
 // The nav is derived from the published vault pages, so a new page with
 // `publish: true` shows up here without a code change. Links point at the
-// canonical URL (file-style `.md` permalinks included) to avoid the
-// Worker's 301 redirect hop.
+// canonical HTML URL (`/<slug>/`) to avoid the Worker's redirect hop.
 //
 // Nav structure and labels are presentation, not content, so they live here
 // rather than in the vault (same trade-off as the Links list, see the CMS
@@ -32,11 +32,8 @@ const NAV_GROUPS = [
 const pages = await getCollection("pages", ({ data }) => data.publish);
 const publishedByKey = new Map(
   pages.map((page) => {
-    const slug = page.data.permalink ?? page.id;
-    return [
-      slug.replace(/\.md$/, ""),
-      { href: `/${slug}`, title: page.data.title },
-    ];
+    const slug = pageSlug(page);
+    return [slug, { href: htmlPath(slug), title: page.data.title }];
   }),
 );
 const grouped = new Set(
@@ -66,10 +63,7 @@ const navEntries = [
     .sort((a, b) => a.label.localeCompare(b.label)),
 ];
 
-const currentKey = Astro.url.pathname
-  .replace(/\.md$/, "")
-  .replace(/\/$/, "")
-  .replace(/^\//, "");
+const currentKey = Astro.url.pathname.replace(/\/$/, "").replace(/^\//, "");
 
 // The homepage hero already carries the name — no wordmark there.
 const isHome = currentKey === "";

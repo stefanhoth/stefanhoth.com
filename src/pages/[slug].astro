@@ -4,14 +4,13 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import TocSidebar from "@/components/TocSidebar.astro";
 import Layout from "@/layouts/Layout.astro";
+import { htmlPath, markdownPath, pageSlug } from "@/lib/pagePaths.js";
 
 export async function getStaticPaths() {
   const pages = await getCollection("pages", ({ data }) => data.publish);
   // A `permalink` frontmatter field overrides the filename-derived slug.
-  // File-style permalinks (`.md` suffix) still build the folder-style page
-  // here — the Worker serves it under the `.md` URL (see worker/index.js).
   return pages.map((page) => ({
-    params: { slug: (page.data.permalink ?? page.id).replace(/\.md$/, "") },
+    params: { slug: pageSlug(page) },
     props: { page },
   }));
 }
@@ -37,13 +36,10 @@ const bodyClass = useSidebar
     ? "projects-page"
     : undefined;
 
-// The URL the page is served under: file-style permalinks (`.md` suffix)
-// keep the suffix (the Worker serves them there and 301s the bare form),
-// folder-style pages get Astro's trailing-slash URL.
-const slug = (page.data.permalink ?? page.id).replace(/\.md$/, "");
-const canonicalPath = page.data.permalink?.endsWith(".md")
-  ? `/${page.data.permalink}`
-  : `/${slug}/`;
+// The page's HTML URL; its Markdown twin lives at /<slug>.md (see
+// src/pages/[slug].md.js).
+const slug = pageSlug(page);
+const canonicalPath = htmlPath(slug);
 
 // Per-page social card if scripts/generate-og-images.mjs produced one;
 // Layout falls back to the default card otherwise.
@@ -57,6 +53,7 @@ const ogImage = existsSync(join(process.cwd(), `public/img/og/${slug}.png`))
   description={page.data.description}
   bodyClass={bodyClass}
   canonicalPath={canonicalPath}
+  markdownPath={markdownPath(slug)}
   ogImage={ogImage}
 >
   {

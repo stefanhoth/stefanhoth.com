@@ -33,7 +33,7 @@ const ALLOWED_EXTENSION = /\.(pdf|png|jpe?g|webp|gif|avif)$/i;
 
 // What an `![[…]]` embed renders as an <img>; the other allowed type (pdf)
 // becomes a link.
-const IMAGE_EXTENSION = /\.(png|jpe?g|webp|gif|avif)$/i;
+export const IMAGE_EXTENSION = /\.(png|jpe?g|webp|gif|avif)$/i;
 
 // Re-encoded by sharp when published. gif/avif are copied as they are
 // (animated gifs would otherwise lose their frames).
@@ -176,8 +176,8 @@ export function rehypePublicAssetLinks() {
 // - a plain link, for a pdf (the CSP blocks inline PDFs)
 // An embed that doesn't match a file in `_public-assets/` is left as text, so
 // a typo stays visible instead of silently vanishing.
-const EMBED = /!\[\[([^\]|]+)((?:\|[^\]|]*)*)\]\]/g;
-const SIZE = /^(\d+)(?:x\d+)?$/;
+export const EMBED = /!\[\[([^\]|]+)((?:\|[^\]|]*)*)\]\]/g;
+export const SIZE = /^(\d+)(?:x\d+)?$/;
 
 export function remarkObsidianEmbeds({ assets }) {
   const toNode = (target, options) => {

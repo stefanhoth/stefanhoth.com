@@ -1,4 +1,5 @@
 import { onRequestPost } from "../functions/contact.js";
+import { preferredFormat } from "./negotiation.js";
 
 // Requests that match a static asset are served by Cloudflare's asset layer
 // without invoking this Worker — those get their headers from public/_headers.
@@ -33,41 +34,105 @@ function withSecurityHeaders(response) {
   });
 }
 
-// Vault pages with a `.md`-suffixed `permalink` frontmatter field are
-// published as file-style `.md` URLs rather than the folder-style
-// `/<slug>/` URL Astro's static build produces. Requests for the bare or
-// trailing-slash form redirect to the `.md` URL; the `.md` request itself
-// is served by fetching the built page directly, so the visible URL never
-// gets a trailing slash. The slug list is generated at build time into
-// /_file-style-pages.json (see astro.config.mjs) because this Worker is
-// bundled from a plain checkout without access to build-generated modules.
-let fileStyleSlugsPromise;
+// Every published page has two representations under two URLs:
+//   HTML      /<slug>    (homepage: /)
+//   Markdown  /<slug>.md (homepage: /index.md)
+// The URL and the delivered content must always agree. When the request's
+// Accept header ranks the other representation higher (browsers rank
+// text/html, agents rank text/markdown), the client is redirected to that
+// representation's URL instead of getting mismatched content under this one.
+// Without a preference (`*/*`, no Accept header) the URL decides.
+//
+// The slug list is generated at build time into /_pages.json (see
+// astro.config.mjs) because this Worker is bundled from a plain checkout
+// without access to build-generated modules.
+const HOME_SLUG = "index";
+const MARKDOWN_TYPE = "text/markdown; charset=utf-8";
 
-function loadFileStyleSlugs(url, env) {
-  fileStyleSlugsPromise ??= env.ASSETS.fetch(
-    new URL("/_file-style-pages.json", url),
-  )
+let pageSlugsPromise;
+
+function loadPageSlugs(url, env) {
+  pageSlugsPromise ??= env.ASSETS.fetch(new URL("/_pages.json", url))
     .then((response) => (response.ok ? response.json() : []))
+    .then((slugs) => new Set(slugs))
     .catch(() => {
       // Don't cache a transient failure for the isolate's lifetime.
-      fileStyleSlugsPromise = undefined;
-      return [];
+      pageSlugsPromise = undefined;
+      return new Set();
     });
-  return fileStyleSlugsPromise;
+  return pageSlugsPromise;
 }
 
-async function serveFileStyleAlias(url, request, env) {
-  for (const slug of await loadFileStyleSlugs(url, env)) {
-    if (url.pathname === `/${slug}.md`) {
-      const assetRequest = new Request(new URL(`/${slug}/`, url), request);
-      return await env.ASSETS.fetch(assetRequest);
-    }
-    if (url.pathname === `/${slug}` || url.pathname === `/${slug}/`) {
-      return Response.redirect(new URL(`/${slug}.md`, url), 301);
-    }
-  }
-  return null;
+function pathFor(slug, format) {
+  if (format === "markdown") return `/${slug}.md`;
+  return slug === HOME_SLUG ? "/" : `/${slug}`;
 }
+
+// Which page and representation a pathname addresses, or null if it is not
+// a page URL. `/<slug>/` counts as HTML too (it is redirected to `/<slug>`).
+function matchPage(pathname, slugs) {
+  if (pathname === "/") return { slug: HOME_SLUG, format: "html" };
+  if (pathname.endsWith(".md")) {
+    const slug = pathname.slice(1, -3);
+    return slugs.has(slug) ? { slug, format: "markdown" } : null;
+  }
+  const slug = pathname.replace(/^\/|\/$/g, "");
+  return slug !== HOME_SLUG && slugs.has(slug)
+    ? { slug, format: "html" }
+    : null;
+}
+
+async function servePage(request, url, env) {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+
+  const match = matchPage(url.pathname, await loadPageSlugs(url, env));
+  if (!match) return null;
+
+  const { slug, format } = match;
+  const wanted = preferredFormat(request.headers.get("Accept")) ?? format;
+  const destination = pathFor(slug, wanted);
+  const vary = { Vary: "Accept" };
+
+  if (url.pathname !== destination) {
+    // Switching representation depends on the Accept header, so it must not
+    // be cached or remembered as permanent; fixing only the URL's shape
+    // (`/projects/` -> `/projects`) is.
+    const status = wanted === format ? 301 : 307;
+    return new Response(null, {
+      status,
+      headers: { Location: destination + url.search, ...vary },
+    });
+  }
+
+  if (format === "html") {
+    const response = await env.ASSETS.fetch(request);
+    return withHeaders(response, {
+      ...vary,
+      Link: `<${pathFor(slug, "markdown")}>; rel="alternate"; type="text/markdown"`,
+    });
+  }
+
+  const response = await env.ASSETS.fetch(request);
+  if (!response.ok && response.status !== 304) return response;
+  return withHeaders(response, {
+    ...vary,
+    "Content-Type": MARKDOWN_TYPE,
+    Link: `<${pathFor(slug, "html")}>; rel="canonical"; type="text/html"`,
+  });
+}
+
+function withHeaders(response, extra) {
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(extra)) headers.set(name, value);
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+// Build internals that must not be reachable as pages of their own.
+const INTERNAL_PATHS = new Set(["/_pages.json"]);
 
 export default {
   async fetch(request, env) {
@@ -77,9 +142,13 @@ export default {
       return withSecurityHeaders(await onRequestPost({ request, env }));
     }
 
-    const fileStyleResponse = await serveFileStyleAlias(url, request, env);
-    if (fileStyleResponse) {
-      return withSecurityHeaders(fileStyleResponse);
+    if (INTERNAL_PATHS.has(url.pathname)) {
+      return withSecurityHeaders(new Response("Not found", { status: 404 }));
+    }
+
+    const pageResponse = await servePage(request, url, env);
+    if (pageResponse) {
+      return withSecurityHeaders(pageResponse);
     }
 
     return withSecurityHeaders(await env.ASSETS.fetch(request));

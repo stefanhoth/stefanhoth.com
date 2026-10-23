@@ -2,17 +2,17 @@ import { describe, expect, it } from "vitest";
 import { buildSitemap, canonicalPathFor } from "../../src/lib/sitemap.js";
 
 describe("canonicalPathFor", () => {
-  it("keeps the .md suffix for file-style permalinks", () => {
-    expect(
-      canonicalPathFor({ id: "projects", data: { permalink: "projects.md" } }),
-    ).toBe("/projects.md");
+  it("uses the HTML URL without trailing slash, not the .md twin", () => {
+    expect(canonicalPathFor({ id: "about", data: {} })).toBe("/about");
+    expect(canonicalPathFor({ id: "x", data: { permalink: "about" } })).toBe(
+      "/about",
+    );
   });
 
-  it("uses a trailing-slash URL for folder-style pages", () => {
-    expect(canonicalPathFor({ id: "about", data: {} })).toBe("/about/");
-    expect(canonicalPathFor({ id: "x", data: { permalink: "about" } })).toBe(
-      "/about/",
-    );
+  it("ignores a legacy .md suffix on the permalink", () => {
+    expect(
+      canonicalPathFor({ id: "projects", data: { permalink: "projects.md" } }),
+    ).toBe("/projects");
   });
 });
 
