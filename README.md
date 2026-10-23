@@ -10,10 +10,10 @@ Have questions or want to reach out? Please use the **contact form on the websit
 
 If you want to look under the hood, here's what powers this site:
 
-- **Framework**: Astro 5.16.6
-- **Styling**: Tailwind CSS 4.1.18
+- **Framework**: Astro 7
+- **Styling**: Tailwind CSS 4
 - **Languages**: TypeScript, Astro components
-- **Linting & Formatting**: Biome 2.3.10
+- **Linting & Formatting**: Biome 2
 - **Deployment**: Cloudflare Workers (wrangler)
 
 ## Development
@@ -39,7 +39,7 @@ This site runs on [Cloudflare Workers](https://workers.cloudflare.com). A Worker
 
 ## Documentation
 
-For detailed documentation about the codebase, architecture, and development guidelines, see [CLAUDE.MD](./CLAUDE.MD).
+For detailed documentation about the codebase, architecture, and development guidelines, see [AGENTS.md](./AGENTS.md).
 
 ---
 

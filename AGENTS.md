@@ -6,10 +6,10 @@ This is Stefan Hoth's personal website built with Astro, showcasing professional
 
 ## Tech Stack
 
-- **Framework**: Astro 5.16.6
-- **Styling**: Tailwind CSS 4.1.18
+- **Framework**: Astro 7
+- **Styling**: Tailwind CSS 4
 - **Languages**: TypeScript, Astro components
-- **Linting/Formatting**: Biome 2.3.10
+- **Linting/Formatting**: Biome 2
 - **Deployment**: Cloudflare Workers (wrangler)
 
 ## Project Structure
