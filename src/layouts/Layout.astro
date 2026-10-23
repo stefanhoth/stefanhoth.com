@@ -6,11 +6,10 @@ const {
   title = "Stefan Hoth | Engineering Leader",
   description = "Engineering Leader building high-trust engineering organizations. Currently open to Director or Head of Engineering roles, remote-first.",
   bodyClass,
-  // The path the page is actually served under. Differs from the build
-  // path for file-style vault pages: Astro builds /<slug>/, the Worker
-  // serves /<slug>.md and 301s the bare form there (see worker/index.js) —
-  // so canonical/og:url must be the .md URL, not the build URL.
+  // The page's HTML URL, and the URL of its Markdown twin (advertised as an
+  // alternate; the Worker negotiates between the two, see worker/index.js).
   canonicalPath = "/",
+  markdownPath = "/index.md",
   // 1200×630 social preview card, pre-rendered into public/img/og/ by
   // scripts/generate-og-images.mjs (npm run og:images).
   ogImage = "/img/og/default.png",
@@ -33,6 +32,11 @@ const ogImageUrl = new URL(ogImage, Astro.site).href;
     <meta name="author" content="Stefan Hoth" />
     <title>{title}</title>
     <link rel="canonical" href={canonicalUrl} />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href={new URL(markdownPath, Astro.site).href}
+    />
 
     <!-- Social sharing previews (Open Graph for LinkedIn/Facebook/…, Twitter Cards) -->
     <meta property="og:type" content="website" />

@@ -1,10 +1,9 @@
-// Canonical URL path of a published vault page — mirrors the canonicalPath
-// logic in src/pages/[slug].astro: file-style permalinks (`.md` suffix) keep
-// the suffix, everything else gets the folder-style trailing-slash URL.
+import { htmlPath, pageSlug } from "./pagePaths.js";
+
+// Canonical URL path of a published vault page: the HTML representation
+// (the Markdown twin at `/<slug>.md` is an alternate, not a sitemap entry).
 export function canonicalPathFor(page) {
-  const { permalink } = page.data;
-  if (permalink?.endsWith(".md")) return `/${permalink}`;
-  return `/${permalink ?? page.id}/`;
+  return htmlPath(pageSlug(page));
 }
 
 function escapeXml(value) {

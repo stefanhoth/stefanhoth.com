@@ -5,6 +5,7 @@ import mdx from "@astrojs/mdx";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import wikiLink from "remark-wiki-link";
+import { HOME_SLUG, htmlPath } from "./src/lib/pagePaths.js";
 import {
   copyPublicAssets,
   publicAssetHref,
@@ -35,9 +36,9 @@ function parseVaultPage(filename) {
       .trim()
       .toLowerCase()
       .replace(/\s+/g, "-"),
-    permalink: frontmatter.match(
-      /^permalink:\s*["']?([^\s"']+)["']?\s*$/m,
-    )?.[1],
+    permalink: frontmatter
+      .match(/^permalink:\s*["']?([^\s"']+)["']?\s*$/m)?.[1]
+      ?.replace(/\.md$/, ""),
     publish: /^publish:\s*true\s*$/m.test(frontmatter),
   };
 }
@@ -70,22 +71,22 @@ function publicAssetsCopy() {
   };
 }
 
-// Emits the list of file-style page slugs into the build output so the
-// Worker can read it at runtime via the ASSETS binding — the Worker bundle
-// itself is built from a plain checkout (see preview-deploy.yml), so it
-// can't import build-generated modules.
-function fileStyleManifest() {
+// Emits the slugs of all published pages (the homepage as "index") into the
+// build output so the Worker can read them at runtime via the ASSETS binding
+// — the Worker bundle itself is built from a plain checkout (see
+// preview-deploy.yml), so it can't import build-generated modules.
+function pageManifest() {
   return {
-    name: "file-style-manifest",
+    name: "page-manifest",
     hooks: {
       "astro:build:done": ({ dir }) => {
-        const slugs = vaultPages
-          .filter((page) => page.publish && page.permalink?.endsWith(".md"))
-          .map((page) => page.permalink.replace(/\.md$/, ""));
-        writeFileSync(
-          new URL("_file-style-pages.json", dir),
-          JSON.stringify(slugs),
-        );
+        const slugs = [
+          HOME_SLUG,
+          ...vaultPages
+            .filter((page) => page.publish)
+            .map((page) => page.permalink ?? page.slug),
+        ];
+        writeFileSync(new URL("_pages.json", dir), JSON.stringify(slugs));
       },
     },
   };
@@ -93,7 +94,7 @@ function fileStyleManifest() {
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [mdx(), fileStyleManifest(), publicAssetsCopy()],
+  integrations: [mdx(), pageManifest(), publicAssetsCopy()],
   output: "static",
   site: "https://stefanhoth.com",
   base: "/",
@@ -106,13 +107,15 @@ export default defineConfig({
           {
             aliasDivider: "|",
             pathFormat: "obsidian-short",
-            // Resolved wikilinks point at the page's publish URL (its
+            // Resolved wikilinks point at the page's HTML URL (its
             // permalink if set, else the filename slug); unresolved ones
             // keep the slugified name and get marked "new".
             hrefTemplate: (slug) =>
               publicAssets.has(slug)
                 ? publicAssetHref(publicAssets.get(slug))
-                : `/${vaultPagesBySlug.get(slug)?.permalink ?? slug}`,
+                : slug === "home"
+                  ? "/"
+                  : htmlPath(vaultPagesBySlug.get(slug)?.permalink ?? slug),
             permalinks: [
               ...vaultPages.map((page) => page.slug),
               ...publicAssets.keys(),

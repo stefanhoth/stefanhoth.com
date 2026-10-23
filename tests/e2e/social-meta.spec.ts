@@ -2,13 +2,9 @@ import { expect, test } from "@playwright/test";
 
 // Social sharing previews (LinkedIn, Slack, WhatsApp, X, …) are built from
 // the Open Graph / Twitter Card meta tags Layout.astro emits. Each page
-// must carry its own canonical URL (the `.md` form for file-style vault
-// pages — see worker/index.js) and its own pre-rendered 1200×630 card
-// from public/img/og/ (scripts/generate-og-images.mjs).
-//
-// Pages are visited under their build path (folder-style) so the suite
-// also works against the local `astro preview` server, which doesn't run
-// the Worker's `.md` alias/redirect logic.
+// must carry its own canonical URL (the HTML URL, not the `.md` twin) and
+// its own pre-rendered 1200×630 card from public/img/og/
+// (scripts/generate-og-images.mjs).
 const PAGES = [
   {
     path: "/",
@@ -17,17 +13,17 @@ const PAGES = [
   },
   {
     path: "/manager-readme/",
-    canonical: "https://stefanhoth.com/manager-readme.md",
+    canonical: "https://stefanhoth.com/manager-readme/",
     image: "https://stefanhoth.com/img/og/manager-readme.png",
   },
   {
     path: "/employee-readme/",
-    canonical: "https://stefanhoth.com/employee-readme.md",
+    canonical: "https://stefanhoth.com/employee-readme/",
     image: "https://stefanhoth.com/img/og/employee-readme.png",
   },
   {
     path: "/projects/",
-    canonical: "https://stefanhoth.com/projects.md",
+    canonical: "https://stefanhoth.com/projects/",
     image: "https://stefanhoth.com/img/og/projects.png",
   },
 ];

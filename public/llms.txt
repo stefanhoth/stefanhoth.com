@@ -4,11 +4,11 @@
 
 Stefan Hoth has nine years of engineering management experience (Novoda, ResearchGate, SoSafe) and six years building secure, reliable developer execution environments; he applies that same blueprint today to agentic AI workflows. Personal projects lean toward AI agents, job hunting tools, and home automation.
 
-Every page linked below is also served as plain Markdown at the same URL (the links ending in `.md` resolve directly to Markdown, not HTML) — prefer those over the HTML version.
+Every page is served in two representations: HTML at `/<page>/` and plain Markdown at `/<page>.md` (the homepage at `/` and `/index.md`). The links below point at the Markdown versions — prefer those over the HTML version. Requesting an HTML URL with `Accept: text/markdown` redirects to the Markdown URL, and vice versa.
 
 ## Pages
 
-- [Home](https://stefanhoth.com/): Bio, focus areas, and current job search status.
+- [Home](https://stefanhoth.com/index.md): Bio, focus areas, and current job search status.
 - [How I manage](https://stefanhoth.com/manager-readme.md): What direct reports can expect from Stefan as a manager.
 - [How I show up](https://stefanhoth.com/employee-readme.md): What colleagues and managers can expect from Stefan as a direct report.
 - [Projects](https://stefanhoth.com/projects.md): Personal and open-source projects Stefan has built.
