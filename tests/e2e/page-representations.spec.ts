@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Every page exists as HTML at /<slug>/ and as Markdown at /<slug>.md, and
+// Every page exists as HTML at /<slug> and as Markdown at /<slug>.md, and
 // the Cloudflare Worker (worker/index.js) keeps content and URL in line,
 // redirecting based on the Accept header. `astro preview` never runs that
 // Worker, so these only make sense against a real deployment.
@@ -15,9 +15,9 @@ const AGENT = "text/markdown, text/html;q=0.8";
 
 const PAGES = [
   { html: "/", markdown: "/index.md" },
-  { html: "/employee-readme/", markdown: "/employee-readme.md" },
-  { html: "/manager-readme/", markdown: "/manager-readme.md" },
-  { html: "/projects/", markdown: "/projects.md" },
+  { html: "/employee-readme", markdown: "/employee-readme.md" },
+  { html: "/manager-readme", markdown: "/manager-readme.md" },
+  { html: "/projects", markdown: "/projects.md" },
 ];
 
 for (const { html, markdown } of PAGES) {
@@ -79,13 +79,13 @@ for (const { html, markdown } of PAGES) {
 }
 
 for (const slug of ["employee-readme", "manager-readme", "projects"]) {
-  test(`/${slug} completes to /${slug}/`, async ({ request }) => {
-    const response = await request.get(`/${slug}`, {
+  test(`/${slug}/ drops the trailing slash`, async ({ request }) => {
+    const response = await request.get(`/${slug}/`, {
       headers: { Accept: "*/*" },
       maxRedirects: 0,
     });
     expect(response.status()).toBe(301);
-    expect(response.headers().location).toBe(`/${slug}/`);
+    expect(response.headers().location).toBe(`/${slug}`);
   });
 }
 

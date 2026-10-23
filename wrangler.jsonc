@@ -8,6 +8,8 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
+    // /<slug>/ redirects to /<slug>, which serves <slug>.html.
+    "html_handling": "drop-trailing-slash",
     // Page requests go through the Worker so it can serve/redirect the
     // file-style .md URLs, whose slugs are only known at build time
     // (frontmatter-driven — see astro.config.mjs and worker/index.js).

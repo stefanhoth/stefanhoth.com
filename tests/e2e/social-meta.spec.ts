@@ -12,18 +12,18 @@ const PAGES = [
     image: "https://stefanhoth.com/img/og/home.png",
   },
   {
-    path: "/manager-readme/",
-    canonical: "https://stefanhoth.com/manager-readme/",
+    path: "/manager-readme",
+    canonical: "https://stefanhoth.com/manager-readme",
     image: "https://stefanhoth.com/img/og/manager-readme.png",
   },
   {
-    path: "/employee-readme/",
-    canonical: "https://stefanhoth.com/employee-readme/",
+    path: "/employee-readme",
+    canonical: "https://stefanhoth.com/employee-readme",
     image: "https://stefanhoth.com/img/og/employee-readme.png",
   },
   {
-    path: "/projects/",
-    canonical: "https://stefanhoth.com/projects/",
+    path: "/projects",
+    canonical: "https://stefanhoth.com/projects",
     image: "https://stefanhoth.com/img/og/projects.png",
   },
 ];

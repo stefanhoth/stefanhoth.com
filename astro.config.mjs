@@ -98,6 +98,11 @@ export default defineConfig({
   output: "static",
   site: "https://stefanhoth.com",
   base: "/",
+  // Pages are served at /<slug> (no trailing slash): Astro emits <slug>.html
+  // and the Worker's asset layer drops the slash (html_handling in
+  // wrangler.jsonc).
+  trailingSlash: "never",
+  build: { format: "file" },
 
   markdown: {
     processor: unified({

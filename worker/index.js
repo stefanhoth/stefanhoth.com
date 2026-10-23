@@ -35,7 +35,7 @@ function withSecurityHeaders(response) {
 }
 
 // Every published page has two representations under two URLs:
-//   HTML      /<slug>/   (homepage: /)
+//   HTML      /<slug>    (homepage: /)
 //   Markdown  /<slug>.md (homepage: /index.md)
 // The URL and the delivered content must always agree. When the request's
 // Accept header ranks the other representation higher (browsers rank
@@ -65,11 +65,11 @@ function loadPageSlugs(url, env) {
 
 function pathFor(slug, format) {
   if (format === "markdown") return `/${slug}.md`;
-  return slug === HOME_SLUG ? "/" : `/${slug}/`;
+  return slug === HOME_SLUG ? "/" : `/${slug}`;
 }
 
 // Which page and representation a pathname addresses, or null if it is not
-// a page URL. `/<slug>` without the trailing slash counts as HTML.
+// a page URL. `/<slug>/` counts as HTML too (it is redirected to `/<slug>`).
 function matchPage(pathname, slugs) {
   if (pathname === "/") return { slug: HOME_SLUG, format: "html" };
   if (pathname.endsWith(".md")) {
@@ -96,7 +96,7 @@ async function servePage(request, url, env) {
   if (url.pathname !== destination) {
     // Switching representation depends on the Accept header, so it must not
     // be cached or remembered as permanent; fixing only the URL's shape
-    // (`/projects` -> `/projects/`) is.
+    // (`/projects/` -> `/projects`) is.
     const status = wanted === format ? 301 : 307;
     return new Response(null, {
       status,

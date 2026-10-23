@@ -4,7 +4,7 @@
 
 Stefan Hoth has nine years of engineering management experience (Novoda, ResearchGate, SoSafe) and six years building secure, reliable developer execution environments; he applies that same blueprint today to agentic AI workflows. Personal projects lean toward AI agents, job hunting tools, and home automation.
 
-Every page is served in two representations: HTML at `/<page>/` and plain Markdown at `/<page>.md` (the homepage at `/` and `/index.md`). The links below point at the Markdown versions — prefer those over the HTML version. Requesting an HTML URL with `Accept: text/markdown` redirects to the Markdown URL, and vice versa.
+Every page is served in two representations: HTML at `/<page>` and plain Markdown at `/<page>.md` (the homepage at `/` and `/index.md`). The links below point at the Markdown versions — prefer those over the HTML version. Requesting an HTML URL with `Accept: text/markdown` redirects to the Markdown URL, and vice versa.
 
 ## Pages
 

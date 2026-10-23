@@ -13,7 +13,7 @@ const FILES = {
   "/_pages.json": ["index", "projects"],
   "/index.html": "<html>home</html>",
   "/index.md": "# Home",
-  "/projects/index.html": "<html>projects</html>",
+  "/projects.html": "<html>projects</html>",
   "/projects.md": "# Projects",
   "/_public-assets/talk.pdf": "pdf",
 };
@@ -24,7 +24,9 @@ const env = {
       const { pathname } = new URL(
         input instanceof Request ? input.url : input,
       );
-      const key = pathname.endsWith("/") ? `${pathname}index.html` : pathname;
+      const key = /\.\w+$/.test(pathname)
+        ? pathname
+        : `${pathname === "/" ? "/index" : pathname}.html`;
       const file = FILES[key];
       if (file === undefined) return new Response("not found", { status: 404 });
       if (typeof file !== "string") return Response.json(file);
@@ -51,8 +53,8 @@ async function expectRedirect(response, status, location) {
 
 describe("content matches the URL when the client has no preference", () => {
   for (const accept of [undefined, "*/*", "text/plain"]) {
-    it(`serves html at /projects/ and markdown at /projects.md (Accept: ${accept})`, async () => {
-      const html = await get("/projects/", accept);
+    it(`serves html at /projects and markdown at /projects.md (Accept: ${accept})`, async () => {
+      const html = await get("/projects", accept);
       expect(html.status).toBe(200);
       expect(html.headers.get("Content-Type")).toContain("text/html");
       expect(await html.text()).toBe("<html>projects</html>");
@@ -73,30 +75,30 @@ describe("content matches the URL when the client has no preference", () => {
     );
   });
 
-  it("completes /projects to /projects/ permanently", async () => {
-    await expectRedirect(await get("/projects", "*/*"), 301, "/projects/");
+  it("drops the trailing slash permanently", async () => {
+    await expectRedirect(await get("/projects/", "*/*"), 301, "/projects");
   });
 });
 
 describe("redirects to the URL that fits the preferred format", () => {
   it("sends markdown-preferring clients from html URLs to .md", async () => {
-    await expectRedirect(await get("/projects/", AGENT), 307, "/projects.md");
+    await expectRedirect(await get("/projects", AGENT), 307, "/projects.md");
     await expectRedirect(await get("/projects", AGENT), 307, "/projects.md");
     await expectRedirect(await get("/", AGENT), 307, "/index.md");
   });
 
   it("sends html-preferring clients (browsers) from .md URLs to html", async () => {
-    await expectRedirect(await get("/projects.md", BROWSER), 307, "/projects/");
+    await expectRedirect(await get("/projects.md", BROWSER), 307, "/projects");
     await expectRedirect(await get("/index.md", BROWSER), 307, "/");
   });
 
   it("does not redirect when URL and preference already agree", async () => {
-    expect((await get("/projects/", BROWSER)).status).toBe(200);
+    expect((await get("/projects", BROWSER)).status).toBe(200);
     expect((await get("/projects.md", AGENT)).status).toBe(200);
   });
 
   it("keeps the query string and marks the response as varying by Accept", async () => {
-    const response = await get("/projects/?a=1", AGENT);
+    const response = await get("/projects?a=1", AGENT);
     expect(response.headers.get("Location")).toBe("/projects.md?a=1");
     expect(response.headers.get("Vary")).toBe("Accept");
   });
@@ -125,7 +127,7 @@ describe("redirects to the URL that fits the preferred format", () => {
 
 describe("page responses", () => {
   it("advertises the other representation and varies by Accept", async () => {
-    const html = await get("/projects/", BROWSER);
+    const html = await get("/projects", BROWSER);
     expect(html.headers.get("Vary")).toBe("Accept");
     expect(html.headers.get("Link")).toBe(
       '</projects.md>; rel="alternate"; type="text/markdown"',
@@ -134,15 +136,15 @@ describe("page responses", () => {
     const markdown = await get("/projects.md", AGENT);
     expect(markdown.headers.get("Vary")).toBe("Accept");
     expect(markdown.headers.get("Link")).toBe(
-      '</projects/>; rel="canonical"; type="text/html"',
+      '</projects>; rel="canonical"; type="text/html"',
     );
   });
 
   it("keeps the security headers on page responses and redirects", async () => {
     for (const response of [
-      await get("/projects/", BROWSER),
+      await get("/projects", BROWSER),
       await get("/projects.md", AGENT),
-      await get("/projects/", AGENT),
+      await get("/projects", AGENT),
     ]) {
       expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
     }

@@ -1,7 +1,7 @@
 // URL scheme of a published page. Every page has two representations under
 // two different URLs, and the Worker (worker/index.js) keeps content and URL
 // in line:
-// - HTML at `/<slug>/` (the homepage at `/`)
+// - HTML at `/<slug>` (the homepage at `/`)
 // - Markdown at `/<slug>.md` (the homepage at `/index.md`)
 //
 // A `.md` suffix on the `permalink` frontmatter field is a legacy of the
@@ -14,7 +14,7 @@ export function pageSlug({ id, data }) {
 }
 
 export function htmlPath(slug) {
-  return slug === HOME_SLUG ? "/" : `/${slug}/`;
+  return slug === HOME_SLUG ? "/" : `/${slug}`;
 }
 
 export function markdownPath(slug) {
