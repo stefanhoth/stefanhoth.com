@@ -1,6 +1,7 @@
 import { sendMailViaSmtp } from "./smtp.js";
 
-const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const CONTACT_DESTINATION = "website-form@stefanhoth.de";
 const CONTACT_SENDER = "website-form@stefanhoth.de";
 const SMTP_HOST = "smtp.mailbox.org";
@@ -9,7 +10,10 @@ const SMTP_PORT = 465;
 function escapeHtml(str) {
   return str.replace(
     /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
   );
 }
 

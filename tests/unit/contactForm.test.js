@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildUrlWithoutStatusParams, getStatusKeyFromSearch } from "../../src/lib/contactForm.js";
+import {
+  buildUrlWithoutStatusParams,
+  getStatusKeyFromSearch,
+} from "../../src/lib/contactForm.js";
 
 describe("getStatusKeyFromSearch", () => {
   it("returns null when there is no status param", () => {
@@ -22,7 +25,11 @@ describe("getStatusKeyFromSearch", () => {
 
 describe("buildUrlWithoutStatusParams", () => {
   it("strips sent/error but keeps other params, path and hash", () => {
-    const url = buildUrlWithoutStatusParams("/", "?sent=true&ref=newsletter", "#contact");
+    const url = buildUrlWithoutStatusParams(
+      "/",
+      "?sent=true&ref=newsletter",
+      "#contact",
+    );
     expect(url).toBe("/?ref=newsletter#contact");
   });
 

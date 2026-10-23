@@ -27,7 +27,12 @@ export function buildUrlWithoutStatusParams(pathname, search, hash) {
   return `${pathname}${query ? `?${query}` : ""}${hash}`;
 }
 
-export function initContactForm({ form, statusEl, win = window, turnstileLoadTimeoutMs = 8000 }) {
+export function initContactForm({
+  form,
+  statusEl,
+  win = window,
+  turnstileLoadTimeoutMs = 8000,
+}) {
   const submitButton = form?.querySelector('button[type="submit"]');
   const turnstileWidget = form?.querySelector(".cf-turnstile");
   let turnstileIssueActive = false;
@@ -98,5 +103,10 @@ export function initContactForm({ form, statusEl, win = window, turnstileLoadTim
 
   showStatusFromLocation();
 
-  return { showStatus, handleTurnstileSuccess, handleTurnstileError, handleTurnstileExpired };
+  return {
+    showStatus,
+    handleTurnstileSuccess,
+    handleTurnstileError,
+    handleTurnstileExpired,
+  };
 }
