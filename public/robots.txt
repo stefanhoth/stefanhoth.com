@@ -1,4 +1,9 @@
+# Content Signals (https://contentsignals.org/): search=yes lets this site
+# be indexed and shown in search results, ai-input=yes lets AI systems use
+# it as live input (answers, summaries, agents), ai-train=no asks that it
+# is not used to train models.
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
 
 Sitemap: https://stefanhoth.com/sitemap.xml
