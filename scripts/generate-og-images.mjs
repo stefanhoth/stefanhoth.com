@@ -7,6 +7,7 @@
 // thing that changes that frontmatter — it regenerates the cards and
 // commits them alongside the synced content. Output is deterministic, so
 // an unchanged vault produces byte-identical files and no commit churn.
+// Cards of pages that are no longer published are removed.
 // Run manually after changing the card design or profile photo:
 //
 //   npm run og:images
@@ -14,7 +15,13 @@
 // Rendering: sharp composites an SVG (background wash + text, mirroring
 // the site's palette in src/layouts/Layout.astro) with the brush-stroke
 // profile cutout from src/assets/profile.png.
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import sharp from "sharp";
 
 const WIDTH = 1200;
@@ -183,14 +190,27 @@ const pages = readdirSync(VAULT_DIR)
   .map(parseVaultPage)
   .filter((page) => page.isHome || page.publish);
 
+const generated = new Set(["default.png"]);
+
 for (const page of pages) {
   const card = await renderCard(page);
   const filename = page.isHome ? "home.png" : `${page.slug}.png`;
+  generated.add(filename);
   writeFileSync(new URL(filename, OUT_DIR), card);
   console.log(`generated ${filename} (${page.title})`);
   if (page.isHome) {
     // Fallback image for any published page without a generated card.
     writeFileSync(new URL("default.png", OUT_DIR), card);
     console.log("generated default.png (fallback)");
+  }
+}
+
+// The vault is an exact mirror of Obsidian, so a page that was deleted or
+// unpublished there must lose its card here too — otherwise the sync PR
+// would keep serving a stale preview image under /img/og/.
+for (const name of readdirSync(OUT_DIR)) {
+  if (name.endsWith(".png") && !generated.has(name)) {
+    rmSync(new URL(name, OUT_DIR));
+    console.log(`removed ${name} (page no longer published)`);
   }
 }
