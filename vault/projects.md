@@ -51,6 +51,28 @@ Self-hosting an agent means handing it credentials for every API it may ever cal
 
 - [GitHub](https://github.com/stefanhoth/crusty-proxy)
 
+## [🔗 Open in Obsidian](https://github.com/stefanhoth/open-obsidian)
+
+*JavaScript · Cloudflare Workers · Agent Skill · runs entirely in the browser*
+
+**Lets AI agents hand me a link that opens the right note - in Obsidian, on desktop or phone.**
+
+open-obsidian is a single static page that turns an `obsidian://` URI into a normal https link: click it and the note opens in the Obsidian app, in a new tab. That also makes note links work in Telegram, Slack and todo apps, which refuse custom URI schemes. An included agent skill (`npx skills add stefanhoth/open-obsidian`) teaches Claude and other agents to build these links, alongside the obsidian-cli skill. Without parameters, the page shows a small generator for vault and file.
+
+### Motivation
+
+Agents like Claude could already create notes in my vault through the Obsidian CLI. But whenever they tried to link me to the result, it broke: the link opened in the agent's project folder, its private scratchpad, or some other wrong place - never in my actual vault. A plain https link that points to the real file in my Obsidian desktop or mobile app closed that gap.
+
+### What I learned
+
+- Getting URL encoding right is the whole trick: encode the values, then the entire URI once more - and not a third time.
+- GitHub Pages can't do real 301 redirects. Moving to Cloudflare Workers meant keeping the old URL alive with an instant client-side redirect that keeps every parameter.
+- Even a one-file page needs a security review: inserting the URL parameter into HTML unescaped was an XSS hole.
+- Writing an agent skill forces you to spell out what "obvious" usage really looks like.
+
+- [GitHub](https://github.com/stefanhoth/open-obsidian)
+- [Live Web App](https://open-obsidian.stefanhoth.com/)
+
 ## [🔤 MonoMix](https://github.com/stefanhoth/monomix)
 
 *Svelte · TypeScript · Cloudflare Workers · runs entirely in the browser*
