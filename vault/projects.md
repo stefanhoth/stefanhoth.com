@@ -37,6 +37,30 @@ I came out with a lot of practical puzzle pieces I will be using in the future.
 - [GitHub](https://github.com/stefanhoth/starlog)
 - [Live Web App](https://starlog.stefanhoth.com/)
 
+## [🔁 unfocused](https://github.com/stefanhoth/unfocused)
+
+*Swift 6 · SwiftUI · Apple Foundation Models · runs entirely on my Mac*
+
+**Keeps track of everything I've already started, so I finish it before starting something new.**
+
+unfocused doesn't replace my todo list or my notes app, and the work stays in the apps where it happens. It tracks and logs my work in progress. It records where work happens across Slack, Mail, docs and the browser, and it helps me close more Loops by staying focused instead of jumping between them. One hotkey opens a panel that offers my open Loops first. Starting a new one takes an extra key. Each Loop keeps links to where the work lives and a note on where I left off, so I can pick it up again quickly. A Loop I haven't touched for three active days becomes a Loose End, and a short Tie-off walks me through them one at a time. A daily or weekly Recap lists what I closed, moved forward and started. There's no server and no account. Data, logs and the on-device AI all stay on my Mac.
+
+### Motivation
+
+I start things everywhere, and for years my brain was the only place that held the full picture. That stopped working. Things slipped, and whenever I had a free moment I started yet another thing instead of finishing one I had already opened. A todo app didn't help, because I wasn't missing a list. I was losing track of work spread across ten tools.
+
+### What I learned
+
+- Getting back into an existing Loop is plain ↩, and starting a new one is ⌘↩. That one extra key makes me stop and choose.
+- DESIGN.md lists the principles, the flows and the keys for each screen. Every UI change follows it or updates it in the same PR, which keeps the screens consistent as the app grows.
+- Keyboard-first apps still need full mouse support. Each key and its click call the same function, so they can't drift apart.
+- Words change how an action feels. I renamed "Drop" to "Let go", so ending a Loop on purpose reads as a decision, not a failure.
+- Apple's on-device Foundation Models write the Recap summaries and suggest related Loops. They sit behind a replaceable interface, so tests use a fake.
+- All domain rules live in a core package without any UI code, so I can test a permission-heavy macOS app without running its UI.
+- Shipping a Mac app needs its own setup. A stable signing certificate keeps macOS permissions across updates, and a Homebrew cask replaces a custom updater.
+
+- [GitHub](https://github.com/stefanhoth/unfocused)
+
 ## [🦀 crusty-proxy](https://github.com/stefanhoth/crusty-proxy)
 
 *Rust · MCP · security*
