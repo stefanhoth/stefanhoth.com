@@ -37,7 +37,7 @@ I came out with a lot of practical puzzle pieces I will be using in the future.
 - [GitHub](https://github.com/stefanhoth/starlog)
 - [Live Web App](https://starlog.stefanhoth.com/)
 
-## [🔁 unfocused](https://github.com/stefanhoth/unfocused)
+## [🔁 unfocused](https://unfocused.stefanhoth.com)
 
 *Swift 6 · SwiftUI · Apple Foundation Models · runs entirely on my Mac*
 
@@ -59,7 +59,10 @@ I start things everywhere, and for years my brain was the only place that held t
 - All domain rules live in a core package without any UI code, so I can test a permission-heavy macOS app without running its UI.
 - Shipping a Mac app needs its own setup. A stable signing certificate keeps macOS permissions across updates, and a Homebrew cask replaces a custom updater.
 
+I came out with a deeper appreciation of great productivity apps.
+
 - [GitHub](https://github.com/stefanhoth/unfocused)
+- [Website](https://unfocused.stefanhoth.com)
 
 ## [🦀 crusty-proxy](https://github.com/stefanhoth/crusty-proxy)
 
@@ -93,6 +96,8 @@ Agents like Claude could already create notes in my vault through the Obsidian C
 - GitHub Pages can't do real 301 redirects. Moving to Cloudflare Workers meant keeping the old URL alive with an instant client-side redirect that keeps every parameter.
 - Even a one-file page needs a security review: inserting the URL parameter into HTML unescaped was an XSS hole.
 - Writing an agent skill forces you to spell out what "obvious" usage really looks like.
+
+Even small problems deserve a solution.
 
 - [GitHub](https://github.com/stefanhoth/open-obsidian)
 - [Live Web App](https://open-obsidian.stefanhoth.com/)
