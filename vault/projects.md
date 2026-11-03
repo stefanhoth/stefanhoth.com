@@ -102,7 +102,7 @@ Even small problems deserve a solution.
 - [GitHub](https://github.com/stefanhoth/open-obsidian)
 - [Live Web App](https://open-obsidian.stefanhoth.com/)
 
-## [🔤 MonoMix](https://github.com/stefanhoth/monomix)
+## [🔤 MonoMix](https://monomix.stefanhoth.com/about)
 
 *Svelte · TypeScript · Cloudflare Workers · runs entirely in the browser*
 
@@ -124,6 +124,7 @@ A written domain glossary keeps a solo project's naming consistent across code, 
 
 A small council of specialist review agents covering persistence, accessibility, product fit, and evidence catches state-corruption bugs a single review pass misses.
 
+- [Learn more](https://monomix.stefanhoth.com/about)
 - [GitHub](https://github.com/stefanhoth/monomix)
 - [Live Web App](https://monomix.stefanhoth.com/)
 
