@@ -96,7 +96,7 @@ The site runs on Cloudflare Workers. A single Worker (`worker/index.js`, configu
 
 **Headers**:
 - Security headers (X-Frame-Options, X-Content-Type-Options, HSTS, CSP, Referrer-Policy, Permissions-Policy) are defined in two places that must be kept in sync: `public/_headers` (applied by the assets platform) and the `SECURITY_HEADERS` object in `worker/index.js`
-- The CSP allows `https://challenges.cloudflare.com` (script + frame) for the Turnstile widget
+- The CSP allows `https://challenges.cloudflare.com` (script + frame) for the Turnstile widget and `https://www.youtube-nocookie.com` (frame only) for click-to-load YouTube videos
 - `public/_headers` caches `/_astro/*` for 1 year with the immutable directive
 
 **Deploys**:
@@ -133,6 +133,12 @@ Frontmatter controls publishing:
 Every published page (and the homepage) exists in two representations under two URLs: HTML at `/<slug>` (homepage `/`; no trailing slash) and Markdown at `/<slug>.md` (homepage `/index.md`). The Markdown twins are static endpoints (`src/pages/[slug].md.js`, `src/pages/index.md.js`) that run the vault body through `src/lib/agentMarkdown.js`: wikilinks and `![[…]]` embeds become plain Markdown links with absolute URLs, vault-relative asset links are made absolute, Obsidian `%%comments%%` are dropped, and a `# title` heading is added if the body has none.
 
 The Worker (`worker/index.js`, negotiation in `worker/negotiation.js`) makes sure content and URL always agree: it reads the `Accept` header, and if the client ranks the other representation higher (`text/markdown` vs. `text/html`, q-values and specificity per RFC 9110) it answers `307` with the matching URL — so browsers opening a `.md` link end up on the HTML page, and agents sending `Accept: text/markdown` to an HTML URL end up on the `.md` file. Without a preference (`*/*`, no header) the URL decides. `/<slug>/` gets a `301` to `/<slug>`. Astro emits `<slug>.html` (`build.format: "file"`, `trailingSlash: "never"`) and `html_handling: "drop-trailing-slash"` in `wrangler.jsonc` makes the asset layer serve it at `/<slug>`. Page responses carry `Vary: Accept` plus a `Link` header pointing at the other representation. The page list comes from `dist/_pages.json` (integration in `astro.config.mjs`, kept private by the Worker); `run_worker_first` in `wrangler.jsonc` routes page requests through the Worker. These rules only run in the Worker, not in `astro dev`/`astro preview`; test them with `npm run worker:dev` or the unit tests in `tests/unit/worker-pages.test.js`.
+
+### YouTube videos
+
+A paragraph holding only an image whose URL is a YouTube video — `![Recording: Title](https://youtu.be/<id>)` (also `watch?v=`, `/live/`, `/embed/`, `/shorts/`) — becomes a click-to-load player on every template. Obsidian renders the same line as an embedded player, so it previews while writing. `src/lib/rehypeYouTube.js` (registered before `rehypeProjectCards` in `astro.config.mjs`) turns it into `<figure class="video">` holding a poster link; `src/lib/videoFacade.js` (loaded by `src/pages/[slug].astro`) swaps the poster for a `youtube-nocookie.com` iframe on a plain left-click. Until then nothing is requested from YouTube/Google (no thumbnail, no cookies), which is why no consent banner is needed; without JS or on a modified click the poster is just a link to the video. The alt text is the poster title. URL parsing (strict host allowlist) is in `src/lib/youtube.js`.
+
+In a `template: projects` card the placement decides visibility: the line directly after the abstract is shown in the card; under a `### Recording` h3 it sits in the collapsed `<details>`. Cards without a video are unaffected. The Markdown twin (`agentMarkdown.js`) turns the embed into a plain `[▶ Title](watch url)` link.
 
 ### Public Assets (PDFs & images)
 
