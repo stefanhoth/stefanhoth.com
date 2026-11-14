@@ -9,6 +9,7 @@ test("/llms.txt is served with the expected llms.txt structure", async ({
   const response = await request.get("/llms.txt");
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toContain("text/plain");
+  expect(response.headers()["content-type"]).toContain("charset=utf-8");
 
   const body = await response.text();
   expect(body).toMatch(/^# Stefan Hoth\n/);
