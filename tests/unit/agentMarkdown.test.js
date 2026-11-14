@@ -24,6 +24,20 @@ describe("toAgentMarkdown", () => {
     );
   });
 
+  it("turns a YouTube image embed into a plain video link", () => {
+    const out = convert(
+      "# T\n\n![Recording: My talk](https://youtu.be/dQw4w9WgXcQ)\n\n![Photo](_public-assets/p.jpg) ![x](https://example.com/a.png)",
+    );
+    expect(out).toContain(
+      "[▶ Recording: My talk](https://www.youtube.com/watch?v=dQw4w9WgXcQ)",
+    );
+    expect(out).not.toContain("![Recording");
+    expect(out).toContain(
+      "![Photo](https://stefanhoth.com/_public-assets/p.jpg)",
+    );
+    expect(out).toContain("![x](https://example.com/a.png)");
+  });
+
   it("drops the link, keeps the text for unknown targets", () => {
     expect(convert("# T\n\n[[secret note|label]] and [[other]]")).toContain(
       "label and other",

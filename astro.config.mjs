@@ -14,6 +14,7 @@ import {
   remarkObsidianEmbeds,
 } from "./src/lib/publicAssets.js";
 import rehypeProjectCards from "./src/lib/rehypeProjectCards.js";
+import rehypeYouTube from "./src/lib/rehypeYouTube.js";
 
 // Vault files are the source of truth for what gets published and under
 // which URL. The filename provides the default slug; an optional
@@ -132,7 +133,11 @@ export default defineConfig({
         ],
         [remarkObsidianEmbeds, { assets: publicAssets }],
       ],
-      rehypePlugins: [rehypeProjectCards, rehypePublicAssetLinks],
+      rehypePlugins: [
+        rehypeYouTube,
+        rehypeProjectCards,
+        rehypePublicAssetLinks,
+      ],
     }),
   },
 

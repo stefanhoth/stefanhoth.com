@@ -15,9 +15,11 @@ import {
   publicAssetHref,
   SIZE,
 } from "./publicAssets.js";
+import { parseYouTubeId, youtubeWatchUrl } from "./youtube.js";
 
 const WIKILINK = /(?<!!)\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]/g;
 const RELATIVE_ASSET = /\]\((?:\.\/)?(_public-assets\/)/g;
+const MARKDOWN_IMAGE = /!\[([^\]]*)\]\(([^)\s]+)\)/g;
 const OBSIDIAN_COMMENT = /%%[\s\S]*?%%/g;
 const FENCE = /^\s*(```|~~~)/;
 const H1 = /^# /m;
@@ -50,6 +52,13 @@ function makeTransform({ site, pages, assets }) {
     return `![${label ?? name.replace(/\.[^.]+$/, "")}](${url})`;
   };
 
+  // `![title](youtube-url)` is a player in Obsidian and a facade on the site;
+  // as plain Markdown it is a link to the video, not an image.
+  const video = (match, alt, url) => {
+    const id = parseYouTubeId(url);
+    return id ? `[▶ ${alt.trim() || "Video"}](${youtubeWatchUrl(id)})` : match;
+  };
+
   const wikilink = (_match, target, alias) => {
     const label = (alias ?? target).trim();
     const name = target.trim();
@@ -69,6 +78,7 @@ function makeTransform({ site, pages, assets }) {
     text
       .replace(OBSIDIAN_COMMENT, "")
       .replace(EMBED, embed)
+      .replace(MARKDOWN_IMAGE, video)
       .replace(WIKILINK, wikilink)
       .replace(
         RELATIVE_ASSET,
