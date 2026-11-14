@@ -15,6 +15,7 @@ test("/llms.txt is served with the expected llms.txt structure", async ({
   expect(body).toContain("\n> ");
   expect(body).toContain("## Pages");
   expect(body).toContain("(https://stefanhoth.com/manager-readme.md)");
+  expect(body).toContain("(https://stefanhoth.com/talks.md)");
   expect(body).toContain("(https://stefanhoth.com/employee-readme.md)");
   expect(body).toContain("(https://stefanhoth.com/projects.md)");
 });
