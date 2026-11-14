@@ -18,6 +18,9 @@ Things I talked about on stage and in meetups - mostly about building with AI, e
 
 <2–3 Sätze Abstract: Worum geht's, für wen, welches Problem.>
 
+%% Optional: Video. Sichtbar direkt in der Karte, wenn die Zeile hier steht. Zum Einklappen stattdessen unter eine Überschrift `### Recording` setzen. Ohne Video: Zeile weglassen. %%
+![Recording: <Talk-Titel>](https://www.youtube.com/watch?v=<VIDEO_ID>)
+
 ### Why I gave this talk
 
 <Motivation, Kontext, Bezug zu [[projects|STARlog]].>
@@ -29,7 +32,6 @@ Things I talked about on stage and in meetups - mostly about building with AI, e
 3. <Takeaway 3>
 
 - [Slides](<url>)
-- [Recording](<url>)
 - [Event](<url>)
 
 ## [🚚 <Migration-Talk-Titel>](<link-zu-slides-oder-event>)
@@ -51,5 +53,4 @@ Things I talked about on stage and in meetups - mostly about building with AI, e
 3. <Takeaway 3>
 
 - [Slides](<url>)
-- [Recording](<url>)
 - [Event](<url>)
