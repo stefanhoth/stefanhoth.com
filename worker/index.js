@@ -48,6 +48,7 @@ function withSecurityHeaders(response) {
 // without access to build-generated modules.
 const HOME_SLUG = "index";
 const MARKDOWN_TYPE = "text/markdown; charset=utf-8";
+const TEXT_TYPE = "text/plain; charset=utf-8";
 
 let pageSlugsPromise;
 
@@ -151,6 +152,14 @@ export default {
       return withSecurityHeaders(pageResponse);
     }
 
-    return withSecurityHeaders(await env.ASSETS.fetch(request));
+    const assetResponse = await env.ASSETS.fetch(request);
+    // The assets layer serves .txt as bare `text/plain`; without a charset
+    // clients guess Latin-1 and mangle non-ASCII characters (e.g. em dashes).
+    if (url.pathname === "/llms.txt" && assetResponse.ok) {
+      return withSecurityHeaders(
+        withHeaders(assetResponse, { "Content-Type": TEXT_TYPE }),
+      );
+    }
+    return withSecurityHeaders(assetResponse);
   },
 };

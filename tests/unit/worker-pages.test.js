@@ -16,6 +16,7 @@ const FILES = {
   "/projects.html": "<html>projects</html>",
   "/projects.md": "# Projects",
   "/_public-assets/talk.pdf": "pdf",
+  "/llms.txt": "# Stefan Hoth — llms",
 };
 
 const env = {
@@ -168,5 +169,14 @@ describe("everything else", () => {
     const response = await get("/_public-assets/talk.pdf", AGENT);
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("pdf");
+  });
+});
+
+describe("llms.txt", () => {
+  it("is served with an explicit UTF-8 charset", async () => {
+    const response = await get("/llms.txt");
+    expect(response.headers.get("Content-Type")).toBe(
+      "text/plain; charset=utf-8",
+    );
   });
 });
