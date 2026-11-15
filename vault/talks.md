@@ -16,13 +16,13 @@ Things I talked about on stage and in meetups - mostly about building with AI, e
 
 **AI made building a migration cheap. Convincing people is still the expensive part, and it's still your job.**
 
-Most of us let AI do the heavy lifting every day, so why do big migrations still stall? I compare a 2022 frontend migration from 2022 (React inside a 15-year-old PHP monolith to a Next.js frontend) with a migration my team is running today. AI shrank the prototype and the implementation from weeks to an afternoon. Agreeing on the problem and earning trust still take as long as they always did.
+Most of us let AI do the heavy lifting every day, so why do big migrations still stall? I compare a 2022 frontend migration from 2022 - moving React inside a 15-year-old PHP monolith to a Next.js frontend - with a migration my team is running today. AI shrank the prototype and the implementation from weeks to an afternoon. Agreeing on the problem and earning trust still take as long as they always did.
+
+![Recording: What Al changed about migrations (and what it didn't) | Stefan Hoth @ next app devCon 2026](https://youtu.be/4e2ZtWlT7h4?is=4Ji7GICseOY5Y4W9)
 
 ### Why I gave this talk
 
 While AI tools were writing code for the rest of us, my lead engineer was writing a long RFC by hand, building demo repos and running discussions. It felt like being back in the Stone Age, but he was right. After 15+ years as a contractor, in mobile and in platform leadership, I keep seeing migrations fail because of people, not technology. I wanted to show why AI doesn't change that, and how it can even make it worse.
-
-![Recording: What Al changed about migrations (and what it didn't) Stefan Hoth | next app devCon 2026](https://youtu.be/4e2ZtWlT7h4?is=4Ji7GICseOY5Y4W9)
 
 ### Key takeaways
 
@@ -31,7 +31,7 @@ While AI tools were writing code for the rest of us, my lead engineer was writin
 3. **Small makes trust possible.** Ship one tiny feature with a hard deadline to production. Risk doesn't disappear, it moves: code can be rolled back, trust can't.
 
 - [[migrations-and-AI.pdf|Slides (PDF)]]
-- Recording: ⏳*waiting for it*
+- [Recording](https://youtu.be/4e2ZtWlT7h4)
 - [Event](https://www.nextappcon.com/techlead-summit)
 
 ## [⭐ How I designed, built and shipped STARlog](https://luma.com/qg7ni1r8)
@@ -61,3 +61,9 @@ I wanted hands-on experience with agentic workflows on a real product, not a toy
 
 My speaking activities started much earlier. I've given a number of talks at developer meetups and conferences like DevFest and Droidcon. 
 However, I was not good at record keeping back then. 😅
+
+To name a few off the top of my head:
+- Droidcon Berlin & London
+- DevFest Berlin
+- Berlin Hack & Tell
+- GDG Berlin
