@@ -42,11 +42,14 @@ Das Ruleset erzwingt für `main`:
 
 - **Pull Request Pflicht** — keine direkten Pushes auf `main` (0 Approvals
   nötig, du kannst deine eigenen PRs also sofort mergen)
-- **Required Status Checks, strict** — die Jobs `Lint`, `Build`, `Test` und
-  `E2E against preview` müssen grün sein, und zwar gegen einen Branch, der auf
-  dem aktuellen `main`-Stand basiert (`strict_required_status_checks_policy`).
-  Ein PR, der hinter `main` zurückliegt, muss vor dem Merge aktualisiert
-  werden. (`E2E against preview` kommt aus `preview-deploy.yml` und testet
+- **Required Status Checks** — die Jobs `Lint`, `Build`, `Test` und
+  `E2E against preview` müssen grün sein. Bewusst *nicht* strict
+  (`strict_required_status_checks_policy: false`): Ein PR, der hinter `main`
+  zurückliegt, darf trotzdem mergen. Sonst gewinnt bei mehreren grünen PRs
+  immer nur einer, und alle anderen müssen aktualisiert werden und die CI
+  erneut durchlaufen. Die PR-CI testet ohnehin den Merge-Ref (PR + `main` zum
+  Zeitpunkt des Laufs); was zwei PRs erst gemeinsam kaputt machen, fängt die
+  CI auf `main` (läuft bei jedem Push). (`E2E against preview` kommt aus `preview-deploy.yml` und testet
   gegen das deployte PR-Preview. Lokal bleibt `npm run test:e2e` für die
   Entwicklung verfügbar.)
 - **Required Deployment** — die `preview`-Environment (aus
