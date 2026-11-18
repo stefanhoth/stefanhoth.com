@@ -16,7 +16,7 @@ jobs:
   # Build runs npm lifecycle scripts (untrusted third-party code), so it is
   # isolated from the deploy job, which holds the Cloudflare secrets.
   build:
-    name: Build
+    name: Build preview
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
